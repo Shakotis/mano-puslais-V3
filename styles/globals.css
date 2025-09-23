@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+/* Space Background Animations */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes twinkle-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes twinkle-slower {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.2; }
+}
+
+.animate-twinkle {
+  animation: twinkle 3s linear infinite;
+}
+
+.animate-twinkle-slow {
+  animation: twinkle-slow 2s linear infinite;
+}
+
+.animate-twinkle-slower {
+  animation: twinkle-slower 4s linear infinite;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
