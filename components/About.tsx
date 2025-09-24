@@ -69,7 +69,7 @@ const About: React.FC = () => {
           viewport={{ once: true }}
           className="max-w-4xl mx-auto mb-16"
         >
-          <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800">
+          <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl" isPressable radius="lg">
             <CardBody className="p-8">
               <p className="text-lg text-gray-300 leading-loose">
                 I am a high school student at Kauno 'Saulės' Gimnazija with a strong passion for design and engineering. 
@@ -100,7 +100,7 @@ const About: React.FC = () => {
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.05 }}
               >
-                <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-indigo-600 transition-colors duration-300">
+                <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-indigo-600 transition-colors duration-300 rounded-xl" isPressable radius="lg">
                   <CardBody className="p-6 text-center">
                     <div className="text-indigo-400 mb-4 flex justify-center">
                       {skill.icon}

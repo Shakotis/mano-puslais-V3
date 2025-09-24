@@ -12,22 +12,16 @@ interface ScrollSection {
 }
 
 interface ThreeScrollBackgroundProps {
-  children: React.ReactNode;
-  sections: ScrollSection[];
+  children?: React.ReactNode;
+  sections?: ScrollSection[];
 }
 
 const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children, sections }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const animationIdRef = useRef<number | null>(null);
-  const navigateToSectionRef = useRef<((sectionIndex: number) => void) | null>(null);
-  const [currentSection, setCurrentSection] = useState(0);
-  const [isScrolling, setIsScrolling] = useState(false);
-  const [debugInfo, setDebugInfo] = useState({ cameraZ: 0 });
-  const { registerNavigation } = useScrollNavigation();
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -60,11 +54,10 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Camera setup
+    // Camera setup - static position for background effect
     const camera = new THREE.PerspectiveCamera(75, viewport.aspectRatio, 0.1, 2000);
     camera.position.set(0, 0, 0);
     cameraRef.current = camera;
-    console.log('Camera initialized:', camera.position);
 
     // Create enhanced starfield with multiple layers
     const starGeometry = new THREE.BufferGeometry();
@@ -178,7 +171,7 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
 
     // Scroll handler for 3D movement
     let targetZ = 0;
-    let scrollTimeout: NodeJS.Timeout;
+    let scrollTimeout: NodeJS.Timeout | null = null;
     
     const onScroll = (event: WheelEvent) => {
       console.log('Scroll event triggered:', { deltaY: event.deltaY, currentSection, isScrolling });
@@ -190,7 +183,10 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
       }
       
       // Clear existing timeout
-      clearTimeout(scrollTimeout);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = null;
+      }
       
       // Direct scroll without timeout for debugging
       const scrollDirection = event.deltaY > 0 ? 1 : -1;
@@ -199,7 +195,13 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
       console.log('Scroll calculation:', { scrollDirection, currentSection, newSection, sectionsLength: sections.length });
 
       if (newSection !== currentSection) {
-        console.log('Starting scroll transition:', { from: currentSection, to: newSection });
+        const sectionNames = ['Hero', 'About', 'Experience', 'Portfolio', 'Current Work', 'Skills', 'Contact'];
+        console.log('Starting scroll transition:', { 
+          from: currentSection, 
+          to: newSection, 
+          fromName: sectionNames[currentSection] || 'Unknown',
+          toName: sectionNames[newSection] || 'Unknown'
+        });
         setIsScrolling(true);
         setCurrentSection(newSection);
         
@@ -209,14 +211,14 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
         
         // Animate camera position with smoother easing and slight shake effect
         gsap.to(camera.position, {
-          duration: 2.2,
+          duration: 1.5, // Reduced duration for faster response
           z: targetZ,
-          ease: "power4.inOut",
+          ease: "power3.inOut", // Slightly less aggressive easing
           onStart: () => {
             // Add subtle camera shake at start of transition
             gsap.to(camera.position, {
-              x: (Math.random() - 0.5) * 2,
-              y: (Math.random() - 0.5) * 1,
+              x: (Math.random() - 0.5) * 1.5,
+              y: (Math.random() - 0.5) * 0.8,
               duration: 0.1,
               yoyo: true,
               repeat: 1
@@ -227,12 +229,17 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
             gsap.to(camera.position, {
               x: 0,
               y: 0,
-              duration: 0.5,
+              duration: 0.4,
               ease: "power2.out"
             });
             setIsScrolling(false);
           }
         });
+        
+        // Safety timeout to reset isScrolling in case animation fails
+        setTimeout(() => {
+          setIsScrolling(false);
+        }, 2000);
 
         // Update content sections visibility
         if (contentRef.current) {
@@ -288,9 +295,9 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
           targetZ = sections[newSection]?.position || 0;
           
           gsap.to(camera.position, {
-            duration: 2.2,
+            duration: 1.5, // Faster response for touch too
             z: targetZ,
-            ease: "power4.inOut",
+            ease: "power3.inOut",
             onStart: () => {
               // Add subtle camera shake for touch interactions
               gsap.to(camera.position, {
@@ -306,12 +313,17 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
               gsap.to(camera.position, {
                 x: 0,
                 y: 0,
-                duration: 0.5,
+                duration: 0.4,
                 ease: "power2.out"
               });
               setIsScrolling(false);
             }
           });
+          
+          // Safety timeout for touch interactions too
+          setTimeout(() => {
+            setIsScrolling(false);
+          }, 2000);
 
           if (contentRef.current) {
             const children = contentRef.current.children;
@@ -366,9 +378,9 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
       
       // Animate camera to new position with enhanced smoothness
       gsap.to(cameraRef.current.position, {
-        duration: 2.5,
+        duration: 1.5, // Consistent faster timing
         z: newTargetZ,
-        ease: "power4.inOut",
+        ease: "power3.inOut",
         onStart: () => {
           // Add subtle camera movement for navigation clicks
           if (cameraRef.current) {
@@ -387,13 +399,18 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
             gsap.to(cameraRef.current.position, {
               x: 0,
               y: 0,
-              duration: 0.6,
+              duration: 0.4,
               ease: "power2.out"
             });
           }
           setIsScrolling(false);
         }
       });
+      
+      // Safety timeout for navigation clicks too
+      setTimeout(() => {
+        setIsScrolling(false);
+      }, 2000);
 
       // Update content visibility
       if (contentRef.current) {
@@ -440,9 +457,6 @@ const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children,
       // Make stars twinkle by adjusting material opacity
       const starMat = stars.material as THREE.PointsMaterial;
       starMat.opacity = 0.6 + Math.sin(time * 2) * 0.2;
-
-      // Update debug info
-      setDebugInfo({ cameraZ: camera.position.z });
 
       renderer.render(scene, camera);
       animationIdRef.current = requestAnimationFrame(animate);

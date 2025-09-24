@@ -190,10 +190,10 @@ const Skills: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
               viewport={{ once: true }}
-              className="h-full"
+              className="h-full flex"
             >
               <Card 
-                className={`${getColorClass(category.color)} backdrop-blur-sm border transition-all duration-300 h-full`}
+                className={`${getColorClass(category.color)} backdrop-blur-sm border transition-all duration-300 w-full flex flex-col rounded-xl min-h-[400px]`}
                 isHoverable
                 radius="lg"
               >
@@ -216,8 +216,8 @@ const Skills: React.FC = () => {
                 
                 <Divider className="opacity-30" />
                 
-                <CardBody className="pt-4">
-                  <div className="space-y-4">
+                <CardBody className="pt-4 flex-1">
+                  <div className="space-y-4 h-full">
                     {category.skills.map((skill, skillIndex) => (
                       <motion.div
                         key={skill.name}
@@ -227,9 +227,10 @@ const Skills: React.FC = () => {
                         viewport={{ once: true }}
                       >
                         <Card
-                          className="bg-gray-800/30 border-gray-700/50"
-                          radius="lg"
+                          className="bg-gray-800/30 border border-gray-600/50 rounded-lg"
+                          radius="md"
                           shadow="sm"
+                          isPressable
                         >
                           <CardBody className="p-4">
                             <div className="flex items-center justify-between mb-2">
@@ -242,12 +243,12 @@ const Skills: React.FC = () => {
                                 </span>
                               </div>
                               <Chip
-                                size="lg"
+                                size="sm"
                                 variant="shadow"
-                                radius="lg"
+                                radius="full"
                                 classNames={{
-                                  base: `${getColorClass(category.color)} border px-4 py-2`,
-                                  content: "font-medium px-2 py-1 text-base",
+                                  base: `${getColorClass(category.color)} border px-2 py-1`,
+                                  content: "font-medium text-xs",
                                 }}
                               >
                                 {skill.experience}

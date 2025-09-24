@@ -1,37 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Input, Textarea } from "@heroui/input";
-import { Button } from "@heroui/button";
 import { motion } from "framer-motion";
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaPaperPlane } from "react-icons/fa";
+import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 
 const Contact: React.FC = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: ""
-  });
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Create mailto URL with form data
-    const mailtoUrl = `mailto:dovydasjusevicius@gmail.com?subject=${encodeURIComponent(formData.subject || 'Contact from Portfolio')}&body=${encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-    )}`;
-    
-    window.location.href = mailtoUrl;
-  };
-
   const contactInfo = [
     {
       icon: <FaEnvelope className="w-5 h-5" />,
@@ -73,96 +47,16 @@ const Contact: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800">
-              <CardHeader>
-                <h3 className="text-2xl font-bold text-gray-100">Send a Message</h3>
-              </CardHeader>
-              <CardBody>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input
-                      label="Name"
-                      placeholder="Your name"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                      classNames={{
-                        inputWrapper: "bg-gray-800/50 border-gray-700",
-                        input: "text-gray-100",
-                        label: "text-gray-400",
-                      }}
-                      required
-                    />
-                    <Input
-                      label="Email"
-                      type="email"
-                      placeholder="your.email@example.com"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      classNames={{
-                        inputWrapper: "bg-gray-800/50 border-gray-700",
-                        input: "text-gray-100",
-                        label: "text-gray-400",
-                      }}
-                      required
-                    />
-                  </div>
-                  
-                  <Input
-                    label="Subject"
-                    placeholder="What's this about?"
-                    value={formData.subject}
-                    onChange={(e) => handleInputChange("subject", e.target.value)}
-                    classNames={{
-                      inputWrapper: "bg-gray-800/50 border-gray-700",
-                      input: "text-gray-100",
-                      label: "text-gray-400",
-                    }}
-                  />
-                  
-                  <Textarea
-                    label="Message"
-                    placeholder="Tell me about your project or idea..."
-                    minRows={4}
-                    value={formData.message}
-                    onChange={(e) => handleInputChange("message", e.target.value)}
-                    classNames={{
-                      inputWrapper: "bg-gray-800/50 border-gray-700",
-                      input: "text-gray-100",
-                      label: "text-gray-400",
-                    }}
-                    required
-                  />
-                  
-                  <Button
-                    type="submit"
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl"
-                    size="lg"
-                    endContent={<FaPaperPlane className="w-4 h-4" />}
-                  >
-                    Send Message
-                  </Button>
-                </form>
-              </CardBody>
-            </Card>
-          </motion.div>
-
+        <div className="max-w-2xl mx-auto">
           {/* Contact Information */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
             className="space-y-6"
           >
-            <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800">
+            <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl" isPressable radius="lg">
               <CardHeader>
                 <h3 className="text-2xl font-bold text-gray-100">Contact Information</h3>
               </CardHeader>
@@ -199,7 +93,7 @@ const Contact: React.FC = () => {
               </CardBody>
             </Card>
 
-            <Card className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 backdrop-blur-sm border border-indigo-600/30">
+            <Card className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 backdrop-blur-sm border border-indigo-600/30 rounded-xl" isPressable radius="lg">
               <CardBody className="p-6 text-center">
                 <h4 className="text-lg font-semibold text-gray-100 mb-2">
                   Let's Build Something Amazing Together

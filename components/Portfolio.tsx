@@ -5,6 +5,7 @@ import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { Divider } from "@heroui/divider";
+import { Accordion, AccordionItem } from "@heroui/accordion";
 import { motion } from "framer-motion";
 import { FaExternalLinkAlt, FaCube, FaPrint, FaGithub, FaDownload } from "react-icons/fa";
 
@@ -23,7 +24,28 @@ const Portfolio: React.FC = () => {
         { name: "3D Printing", icon: <FaPrint className="w-3 h-3" />, color: "warning" }
       ],
       features: ["Tracked Drive System", "Modular Design", "Open Source"],
-      image: "/api/placeholder/400/250"
+      image: "/api/placeholder/400/250",
+      detailedInfo: {
+        overview: "This tracked robot chassis represents a complete mechanical engineering project from conceptual design to final fabrication. The project demonstrates proficiency in CAD design, 3D printing, and mechanical assembly.",
+        challenges: [
+          "Designing a robust track tensioning system",
+          "Ensuring proper weight distribution for stability",
+          "Creating modular mounting points for future expansions"
+        ],
+        lessons: [
+          "Importance of iterative design and prototyping",
+          "Material selection for 3D printed mechanical parts",
+          "Documentation and open-source project management"
+        ],
+        specifications: {
+          "Dimensions": "300mm x 200mm x 150mm",
+          "Weight": "~1.2kg (without electronics)",
+          "Track Material": "TPU flexible filament",
+          "Chassis Material": "PLA+ reinforced plastic",
+          "Assembly Time": "~4 hours",
+          "Print Time": "~18 hours total"
+        }
+      }
     }
   ];
 
@@ -55,7 +77,7 @@ const Portfolio: React.FC = () => {
               className="h-full"
             >
               <Card 
-                className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-indigo-600 transition-all duration-300 h-full"
+                className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-indigo-600 transition-all duration-300 h-full rounded-xl"
                 isHoverable
                 radius="lg"
                 shadow="lg"
@@ -99,29 +121,117 @@ const Portfolio: React.FC = () => {
                     
                     <Divider className="opacity-30" />
                     
-                    {/* Technologies */}
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-300 mb-2">Technologies</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {project.technologies.map((tech) => (
-                          <Chip
-                            key={tech.name}
-                            size="md"
-                            variant="shadow"
-                            radius="lg"
-                            startContent={tech.icon}
-                            classNames={{
-                              base: "bg-indigo-900/40 border-indigo-500/50",
-                              content: "text-indigo-300 font-medium px-1"
-                            }}
-                          >
-                            {tech.name}
-                          </Chip>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* Features */}
+                    {/* Accordion for Detailed Information */}
+                    <Accordion
+                      variant="splitted"
+                      className="px-0"
+                      motionProps={{
+                        variants: {
+                          enter: {
+                            y: 0,
+                            opacity: 1,
+                            height: "auto",
+                            transition: {
+                              height: {
+                                type: "spring",
+                                stiffness: 500,
+                                damping: 30,
+                                duration: 1,
+                              },
+                              opacity: {
+                                easings: "ease",
+                                duration: 1,
+                              },
+                            },
+                          },
+                          exit: {
+                            y: -10,
+                            opacity: 0,
+                            height: 0,
+                            transition: {
+                              height: {
+                                easings: "ease",
+                                duration: 0.25,
+                              },
+                              opacity: {
+                                easings: "ease",
+                                duration: 0.3,
+                              },
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <AccordionItem
+                        key="technologies"
+                        aria-label="Technologies Used"
+                        title={<span className="text-gray-300 font-medium">Technologies Used</span>}
+                        className="bg-gray-800/30 border border-gray-700/50"
+                      >
+                        <div className="flex flex-wrap gap-2 pb-2">
+                          {project.technologies.map((tech) => (
+                            <Chip
+                              key={tech.name}
+                              size="md"
+                              variant="shadow"
+                              radius="lg"
+                              startContent={tech.icon}
+                              classNames={{
+                                base: "bg-indigo-900/40 border-indigo-500/50",
+                                content: "text-indigo-300 font-medium px-1"
+                              }}
+                            >
+                              {tech.name}
+                            </Chip>
+                          ))}
+                        </div>
+                      </AccordionItem>
+
+                      <AccordionItem
+                        key="overview"
+                        aria-label="Project Overview"
+                        title={<span className="text-gray-300 font-medium">Project Overview</span>}
+                        className="bg-gray-800/30 border border-gray-700/50"
+                      >
+                        <p className="text-gray-400 text-sm leading-relaxed pb-2">
+                          {project.detailedInfo.overview}
+                        </p>
+                      </AccordionItem>
+
+                      <AccordionItem
+                        key="challenges"
+                        aria-label="Challenges & Solutions"
+                        title={<span className="text-gray-300 font-medium">Challenges & Solutions</span>}
+                        className="bg-gray-800/30 border border-gray-700/50"
+                      >
+                        <ul className="space-y-2 pb-2">
+                          {project.detailedInfo.challenges.map((challenge, idx) => (
+                            <li key={idx} className="text-gray-400 text-sm flex items-start gap-2">
+                              <span className="text-indigo-400 mt-1">•</span>
+                              {challenge}
+                            </li>
+                          ))}
+                        </ul>
+                      </AccordionItem>
+
+                      <AccordionItem
+                        key="specifications"
+                        aria-label="Technical Specifications"
+                        title={<span className="text-gray-300 font-medium">Technical Specifications</span>}
+                        className="bg-gray-800/30 border border-gray-700/50"
+                      >
+                        <div className="grid grid-cols-1 gap-2 pb-2">
+                          {Object.entries(project.detailedInfo.specifications).map(([key, value]) => (
+                            <div key={key} className="flex justify-between text-sm">
+                              <span className="text-gray-400 font-medium">{key}:</span>
+                              <span className="text-gray-300">{value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionItem>
+                    </Accordion>
+
+                    {/* Key Features */}
                     <div>
                       <h4 className="text-sm font-semibold text-gray-300 mb-2">Key Features</h4>
                       <div className="flex flex-wrap gap-1">
@@ -178,7 +288,7 @@ const Portfolio: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <Card className="bg-gray-900/30 border border-gray-700 border-dashed">
+          <Card className="bg-gray-900/30 border border-gray-700 border-dashed rounded-xl" isPressable radius="lg">
             <CardBody className="p-8">
               <div className="text-gray-500 mb-4">
                 <FaCube className="w-12 h-12 mx-auto" />

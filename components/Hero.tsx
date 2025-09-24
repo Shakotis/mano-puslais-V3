@@ -3,19 +3,9 @@
 import React from "react";
 import { Button } from "@heroui/button";
 import { motion } from "framer-motion";
-import { useScrollNavigation } from "@/contexts/ScrollContext";
-
 const Hero: React.FC = () => {
-  const { navigateToSection } = useScrollNavigation();
-
   const handleContactClick = () => {
-    try {
-      navigateToSection(6); // Contact is section 6
-    } catch (error) {
-      console.error('Navigation error:', error);
-      // Fallback to traditional scroll
-      document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
-    }
+    document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (

@@ -6,12 +6,14 @@ import { Chip } from "@heroui/chip";
 import { Progress } from "@heroui/progress";
 import { motion } from "framer-motion";
 import { FaVrCardboard, FaCamera, FaRobot, FaEye, FaCogs } from "react-icons/fa";
+import { useProjectProgress } from "@/contexts/ProjectProgressContext";
 
 const CurrentWork: React.FC = () => {
+  const { overallProgress } = useProjectProgress();
+  
   const currentProject = {
     title: "Camera Control Platform",
     description: "A camera control platform where a person can wear VR glasses and control the camera's movement by turning their head. This platform will be attached to a robot.",
-    progress: 35,
     technologies: [
       "VR Technology",
       "Camera Control",
@@ -65,7 +67,7 @@ const CurrentWork: React.FC = () => {
           viewport={{ once: true }}
           className="max-w-4xl mx-auto"
         >
-          <Card className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 backdrop-blur-sm border border-indigo-600/30 overflow-hidden">
+          <Card className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 backdrop-blur-sm border border-indigo-600/30 overflow-hidden rounded-xl" radius="lg">
             <CardHeader className="pb-0">
               <div className="w-full">
                 <div className="flex items-center justify-between mb-4">
@@ -85,12 +87,13 @@ const CurrentWork: React.FC = () => {
                   </div>
                 </div>
 
-                <Progress
-                  size="md"
-                  value={currentProject.progress}
+                <Progress 
+                  aria-label="Project Progress" 
+                  size="md" 
+                  value={overallProgress} 
                   color="primary"
-                  className="mb-4"
-                  label={`Progress: ${currentProject.progress}%`}
+                  className="mt-4"
+                  label={`Progress: ${overallProgress}%`}
                   showValueLabel={true}
                 />
               </div>
@@ -130,7 +133,7 @@ const CurrentWork: React.FC = () => {
                       transition={{ duration: 0.5, delay: index * 0.1 }}
                       viewport={{ once: true }}
                     >
-                      <Card className="bg-gray-800/30 border border-gray-700">
+                      <Card className="bg-gray-800/30 border border-gray-700 rounded-lg" radius="md">
                         <CardBody className="p-4">
                           <div className="flex items-start space-x-3">
                             <div className="text-indigo-400 mt-1">
@@ -154,6 +157,8 @@ const CurrentWork: React.FC = () => {
             </CardBody>
           </Card>
         </motion.div>
+
+
       </div>
     </section>
   );
