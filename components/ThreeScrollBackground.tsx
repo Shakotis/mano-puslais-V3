@@ -1,0 +1,580 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import * as THREE from 'three';
+import { gsap } from 'gsap';
+import { useScrollNavigation } from '@/contexts/ScrollContext';
+
+interface ScrollSection {
+  id: string;
+  title: string;
+  position: number; // Z position in 3D space
+}
+
+interface ThreeScrollBackgroundProps {
+  children: React.ReactNode;
+  sections: ScrollSection[];
+}
+
+const ThreeScrollBackground: React.FC<ThreeScrollBackgroundProps> = ({ children, sections }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const animationIdRef = useRef<number | null>(null);
+  const navigateToSectionRef = useRef<((sectionIndex: number) => void) | null>(null);
+  const [currentSection, setCurrentSection] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [debugInfo, setDebugInfo] = useState({ cameraZ: 0 });
+  const { registerNavigation } = useScrollNavigation();
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+
+    let viewport = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      aspectRatio: window.innerWidth / window.innerHeight
+    };
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f0f23); // Deep space color
+    sceneRef.current = scene;
+
+    // Renderer setup
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true
+    });
+    renderer.setSize(viewport.width, viewport.height);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.domElement.style.position = 'fixed';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.left = '0';
+    renderer.domElement.style.zIndex = '-1';
+    renderer.domElement.style.pointerEvents = 'none';
+    container.appendChild(renderer.domElement);
+    rendererRef.current = renderer;
+
+    // Camera setup
+    const camera = new THREE.PerspectiveCamera(75, viewport.aspectRatio, 0.1, 2000);
+    camera.position.set(0, 0, 0);
+    cameraRef.current = camera;
+    console.log('Camera initialized:', camera.position);
+
+    // Create enhanced starfield with multiple layers
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 3000;
+    const starPositions = new Float32Array(starCount * 3);
+    const starColors = new Float32Array(starCount * 3);
+    const starSizes = new Float32Array(starCount);
+    
+    for (let i = 0; i < starCount; i++) {
+      const i3 = i * 3;
+      
+      // Positions
+      starPositions[i3] = (Math.random() - 0.5) * 2000;     // x
+      starPositions[i3 + 1] = (Math.random() - 0.5) * 2000; // y
+      starPositions[i3 + 2] = (Math.random() - 0.5) * 2000; // z
+      
+      // Colors (varying whites and blues)
+      const colorIntensity = Math.random() * 0.5 + 0.5; // 0.5 to 1.0
+      starColors[i3] = colorIntensity;     // r
+      starColors[i3 + 1] = colorIntensity; // g
+      starColors[i3 + 2] = Math.random() < 0.3 ? 1 : colorIntensity; // b (some blue tint)
+      
+      // Sizes
+      starSizes[i] = Math.random() * 3 + 1;
+    }
+    
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+    starGeometry.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
+    
+    const starMaterial = new THREE.PointsMaterial({
+      vertexColors: true,
+      size: 2,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending
+    });
+    
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
+
+    // Add ambient lighting for better material rendering
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+    scene.add(ambientLight);
+    
+    const pointLight = new THREE.PointLight(0xffffff, 0.8, 1000);
+    pointLight.position.set(50, 50, 50);
+    scene.add(pointLight);
+
+    // Add floating geometric shapes for depth with enhanced materials
+    const shapes: THREE.Mesh[] = [];
+    const geometries = [
+      new THREE.BoxGeometry(3, 3, 3),
+      new THREE.SphereGeometry(2, 12, 12),
+      new THREE.ConeGeometry(1.5, 3, 8),
+      new THREE.OctahedronGeometry(2),
+      new THREE.TetrahedronGeometry(2),
+      new THREE.IcosahedronGeometry(1.5)
+    ];
+
+    for (let i = 0; i < 30; i++) {
+      const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+      const hue = Math.random();
+      const material = new THREE.MeshPhongMaterial({
+        color: new THREE.Color().setHSL(hue, 0.7, 0.5),
+        transparent: true,
+        opacity: 0.2,
+        wireframe: Math.random() > 0.5,
+        emissive: new THREE.Color().setHSL(hue, 0.5, 0.1),
+        shininess: 100
+      });
+      
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(
+        (Math.random() - 0.5) * 300,
+        (Math.random() - 0.5) * 300,
+        Math.random() * -1200 - 100
+      );
+      
+      mesh.rotation.set(
+        Math.random() * Math.PI * 2,
+        Math.random() * Math.PI * 2,
+        Math.random() * Math.PI * 2
+      );
+      
+      // Store initial rotation speeds
+      (mesh as any).rotationSpeed = {
+        x: (Math.random() - 0.5) * 0.02,
+        y: (Math.random() - 0.5) * 0.02,
+        z: (Math.random() - 0.5) * 0.02
+      };
+      
+      shapes.push(mesh);
+      scene.add(mesh);
+    }
+
+    // Mouse tracking for subtle camera movement
+    let mousePerspective = { x: 0, y: 0 };
+    const onMouseMove = (event: MouseEvent) => {
+      mousePerspective.x = (event.clientX / window.innerWidth - 0.5) * 0.1;
+      mousePerspective.y = (event.clientY / window.innerHeight - 0.5) * 0.1;
+      
+      gsap.to(camera.rotation, {
+        duration: 2,
+        x: -mousePerspective.y,
+        y: mousePerspective.x,
+        ease: "power2.out"
+      });
+    };
+
+    // Scroll handler for 3D movement
+    let targetZ = 0;
+    let scrollTimeout: NodeJS.Timeout;
+    
+    const onScroll = (event: WheelEvent) => {
+      console.log('Scroll event triggered:', { deltaY: event.deltaY, currentSection, isScrolling });
+      event.preventDefault();
+      
+      if (isScrolling) {
+        console.log('Scroll blocked - already scrolling');
+        return; // Prevent scroll spam
+      }
+      
+      // Clear existing timeout
+      clearTimeout(scrollTimeout);
+      
+      // Direct scroll without timeout for debugging
+      const scrollDirection = event.deltaY > 0 ? 1 : -1;
+      const newSection = Math.max(0, Math.min(sections.length - 1, currentSection + scrollDirection));
+      
+      console.log('Scroll calculation:', { scrollDirection, currentSection, newSection, sectionsLength: sections.length });
+
+      if (newSection !== currentSection) {
+        console.log('Starting scroll transition:', { from: currentSection, to: newSection });
+        setIsScrolling(true);
+        setCurrentSection(newSection);
+        
+        // Calculate target Z position using the section's defined position
+        targetZ = sections[newSection]?.position || 0;
+        console.log('Target Z position:', targetZ, 'Current Z:', camera.position.z);
+        
+        // Animate camera position with smoother easing and slight shake effect
+        gsap.to(camera.position, {
+          duration: 2.2,
+          z: targetZ,
+          ease: "power4.inOut",
+          onStart: () => {
+            // Add subtle camera shake at start of transition
+            gsap.to(camera.position, {
+              x: (Math.random() - 0.5) * 2,
+              y: (Math.random() - 0.5) * 1,
+              duration: 0.1,
+              yoyo: true,
+              repeat: 1
+            });
+          },
+          onComplete: () => {
+            // Reset camera position to center
+            gsap.to(camera.position, {
+              x: 0,
+              y: 0,
+              duration: 0.5,
+              ease: "power2.out"
+            });
+            setIsScrolling(false);
+          }
+        });
+
+        // Update content sections visibility
+        if (contentRef.current) {
+          const children = contentRef.current.children;
+          Array.from(children).forEach((child, index) => {
+            const element = child as HTMLElement;
+            const isActive = index === newSection;
+            
+            gsap.to(element, {
+              duration: 1.5,
+              opacity: isActive ? 1 : 0,
+              scale: isActive ? 1 : 0.9,
+              visibility: isActive ? 'visible' : 'hidden',
+              ease: "power2.inOut"
+            });
+            
+            // Handle pointer events separately since GSAP can't animate CSS properties directly
+            element.style.pointerEvents = isActive ? 'none' : 'none'; // Section level stays none
+          });
+        }
+      }
+    };
+
+    // Touch support for mobile
+    let lastTouchY = 0;
+    let touchStartY = 0;
+    
+    const onTouchStart = (event: TouchEvent) => {
+      touchStartY = event.touches[0].clientY;
+      lastTouchY = event.touches[0].clientY;
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      event.preventDefault();
+      const currentTouchY = event.touches[0].clientY;
+      lastTouchY = currentTouchY;
+    };
+
+    const onTouchEnd = (event: TouchEvent) => {
+      if (isScrolling) return;
+      
+      const deltaY = touchStartY - lastTouchY;
+      const threshold = 50; // Minimum swipe distance
+      
+      if (Math.abs(deltaY) > threshold) {
+        const scrollDirection = deltaY > 0 ? 1 : -1;
+        const newSection = Math.max(0, Math.min(sections.length - 1, currentSection + scrollDirection));
+        
+        if (newSection !== currentSection) {
+          setIsScrolling(true);
+          setCurrentSection(newSection);
+          
+          targetZ = sections[newSection]?.position || 0;
+          
+          gsap.to(camera.position, {
+            duration: 2.2,
+            z: targetZ,
+            ease: "power4.inOut",
+            onStart: () => {
+              // Add subtle camera shake for touch interactions
+              gsap.to(camera.position, {
+                x: (Math.random() - 0.5) * 1.5,
+                y: (Math.random() - 0.5) * 0.8,
+                duration: 0.1,
+                yoyo: true,
+                repeat: 1
+              });
+            },
+            onComplete: () => {
+              // Reset camera position to center
+              gsap.to(camera.position, {
+                x: 0,
+                y: 0,
+                duration: 0.5,
+                ease: "power2.out"
+              });
+              setIsScrolling(false);
+            }
+          });
+
+          if (contentRef.current) {
+            const children = contentRef.current.children;
+            Array.from(children).forEach((child, index) => {
+              const element = child as HTMLElement;
+              const isActive = index === newSection;
+              
+              gsap.to(element, {
+                duration: 1.5,
+                opacity: isActive ? 1 : 0,
+                scale: isActive ? 1 : 0.9,
+                visibility: isActive ? 'visible' : 'hidden',
+                ease: "power2.inOut"
+              });
+              
+              // Section level stays pointer-events: none for scroll handling
+              element.style.pointerEvents = 'none';
+            });
+          }
+        }
+      }
+    };
+
+    // Resize handler
+    const onResize = () => {
+      viewport.width = window.innerWidth;
+      viewport.height = window.innerHeight;
+      viewport.aspectRatio = viewport.width / viewport.height;
+
+      camera.aspect = viewport.aspectRatio;
+      camera.updateProjectionMatrix();
+      renderer.setSize(viewport.width, viewport.height);
+    };
+
+    // Navigation function that can be called from Header
+    const navigateToSection = (sectionIndex: number) => {
+      console.log(`3D Navigation called: going to section ${sectionIndex}`, { 
+        camera: cameraRef.current ? 'exists' : 'null', 
+        currentSection,
+        sectionsLength: sections.length 
+      });
+      if (!cameraRef.current || sectionIndex === currentSection) {
+        console.log('Navigation blocked:', { cameraExists: !!cameraRef.current, sameSection: sectionIndex === currentSection });
+        return;
+      }
+      
+      setIsScrolling(true);
+      setCurrentSection(sectionIndex);
+      
+      const newTargetZ = sections[sectionIndex]?.position || 0;
+      targetZ = newTargetZ;
+      
+      // Animate camera to new position with enhanced smoothness
+      gsap.to(cameraRef.current.position, {
+        duration: 2.5,
+        z: newTargetZ,
+        ease: "power4.inOut",
+        onStart: () => {
+          // Add subtle camera movement for navigation clicks
+          if (cameraRef.current) {
+            gsap.to(cameraRef.current.position, {
+              x: (Math.random() - 0.5) * 1,
+              y: (Math.random() - 0.5) * 0.5,
+              duration: 0.08,
+              yoyo: true,
+              repeat: 1
+            });
+          }
+        },
+        onComplete: () => {
+          // Reset camera position to center
+          if (cameraRef.current) {
+            gsap.to(cameraRef.current.position, {
+              x: 0,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out"
+            });
+          }
+          setIsScrolling(false);
+        }
+      });
+
+      // Update content visibility
+      if (contentRef.current) {
+        const children = contentRef.current.children;
+        Array.from(children).forEach((child, index) => {
+          const element = child as HTMLElement;
+          const isActive = index === sectionIndex;
+          
+          gsap.to(element, {
+            duration: 2,
+            opacity: isActive ? 1 : 0,
+            scale: isActive ? 1 : 0.9,
+            visibility: isActive ? 'visible' : 'hidden',
+            ease: "power2.inOut"
+          });
+          
+          // Keep section level pointer-events as none for scroll handling
+          element.style.pointerEvents = 'none';
+        });
+      }
+    };
+
+    // Animation loop
+    const animate = () => {
+      const time = Date.now() * 0.001;
+      
+      // Animate shapes with individual rotation speeds and floating motion
+      shapes.forEach((shape, index) => {
+        const speed = (shape as any).rotationSpeed;
+        shape.rotation.x += speed.x;
+        shape.rotation.y += speed.y;
+        shape.rotation.z += speed.z;
+        
+        // Add subtle floating motion
+        const floatOffset = index * 2;
+        shape.position.y += Math.sin(time + floatOffset) * 0.02;
+        shape.position.x += Math.cos(time * 0.5 + floatOffset) * 0.01;
+      });
+
+      // Animate stars with parallax effect
+      stars.rotation.y += 0.0001;
+      stars.rotation.z += 0.0001;
+      
+      // Make stars twinkle by adjusting material opacity
+      const starMat = stars.material as THREE.PointsMaterial;
+      starMat.opacity = 0.6 + Math.sin(time * 2) * 0.2;
+
+      // Update debug info
+      setDebugInfo({ cameraZ: camera.position.z });
+
+      renderer.render(scene, camera);
+      animationIdRef.current = requestAnimationFrame(animate);
+    };
+
+    // Event listeners
+    window.addEventListener('mousemove', onMouseMove);
+    container.addEventListener('wheel', onScroll, { passive: false });
+    window.addEventListener('wheel', onScroll, { passive: false }); // Backup on window
+    window.addEventListener('touchstart', onTouchStart, { passive: false });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd, { passive: false });
+    window.addEventListener('resize', onResize);
+
+    animate();
+
+    // Store navigation function in ref for JSX usage
+    navigateToSectionRef.current = navigateToSection;
+
+    // Register navigation function with context
+    console.log('Registering 3D navigation function');
+    registerNavigation(navigateToSection);
+
+    // Initialize content sections visibility
+    if (contentRef.current) {
+      const children = contentRef.current.children;
+      Array.from(children).forEach((child, index) => {
+        const element = child as HTMLElement;
+        const isActive = index === 0; // First section active by default
+        
+        gsap.set(element, {
+          opacity: isActive ? 1 : 0,
+          scale: isActive ? 1 : 0.9,
+          pointerEvents: isActive ? 'auto' : 'none',
+          visibility: isActive ? 'visible' : 'hidden'
+        });
+      });
+    }
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      container.removeEventListener('wheel', onScroll);
+      window.removeEventListener('wheel', onScroll);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('resize', onResize);
+
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+      }
+
+      scene.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+          object.geometry.dispose();
+          if (object.material instanceof THREE.Material) {
+            object.material.dispose();
+          }
+        }
+      });
+
+      renderer.dispose();
+      if (container.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement);
+      }
+    };
+  }, [sections]);
+
+  return (
+    <div ref={containerRef} className="relative min-h-screen overflow-hidden">
+      {/* 3D Background will be added here via Three.js */}
+      
+      {/* Content sections positioned for 3D scroll */}
+      <div ref={contentRef} className="relative">
+        {children}
+      </div>
+
+      {/* Section Navigation */}
+      <div className="fixed right-6 top-1/2 transform -translate-y-1/2 z-50 flex flex-col space-y-4">
+        {sections.map((section, index) => (
+          <div key={section.id} className="relative group">
+            <button
+              onClick={() => navigateToSectionRef.current?.(index)}
+              className={`w-3 h-3 rounded-full border-2 transition-all duration-500 hover:scale-125 ${
+                currentSection === index
+                  ? 'bg-white/90 border-white shadow-lg shadow-white/30 scale-125'
+                  : 'bg-white/20 border-white/40 hover:bg-white/40 hover:border-white/70'
+              }`}
+              style={{ 
+                backdropFilter: 'blur(10px)',
+                boxShadow: currentSection === index 
+                  ? '0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.3)' 
+                  : '0 0 10px rgba(255, 255, 255, 0.2)',
+              }}
+            />
+            {/* Section Label */}
+            <div className={`absolute right-6 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${
+              currentSection === index ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2 group-hover:opacity-70 group-hover:translate-x-0'
+            }`}>
+              <div className="bg-black/80 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm border border-white/20">
+                {section.title}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Scroll Indicator */}
+      <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 transition-opacity duration-1000 ${
+        currentSection === 0 ? 'opacity-100' : 'opacity-30'
+      }`}>
+        <div className="flex flex-col items-center space-y-3 text-white/70">
+          <div className="animate-bounce">
+            <svg 
+              width="24" 
+              height="24" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </div>
+          <span className="text-sm font-light tracking-wide">Scroll to explore</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThreeScrollBackground;

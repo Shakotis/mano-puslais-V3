@@ -12,21 +12,28 @@ import {
 } from "@heroui/navbar";
 import { Link } from "@heroui/link";
 import { motion } from "framer-motion";
+import { useScrollNavigation } from "@/contexts/ScrollContext";
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("#about");
+  const [activeSection, setActiveSection] = useState("#hero");
+  const { navigateToSection } = useScrollNavigation();
 
-  const navItems = [
+  const navItems: Array<{name: string; href: string; external?: boolean}> = [
+    { name: "Home", href: "#hero" },
     { name: "About", href: "#about" },
     { name: "Experience", href: "#experience" },
     { name: "Portfolio", href: "#portfolio" },
+    { name: "3D Gallery", href: "/gallery", external: true },
     { name: "Currently Working On", href: "#current-work" },
+    { name: "Skills", href: "#skills" },
     { name: "Contact", href: "#contact" },
   ];
 
   useEffect(() => {
-    const sections = navItems.map(item => document.querySelector(item.href));
+    // Filter out external links and only observe internal anchor links
+    const internalNavItems = navItems.filter(item => !item.external);
+    const sections = internalNavItems.map(item => document.querySelector(item.href));
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -53,10 +60,36 @@ const Header: React.FC = () => {
     };
   }, []);
 
-  const handleNavClick = (href: string) => {
+  const getSectionIndex = (href: string) => {
+    const sectionMap: { [key: string]: number } = {
+      '#hero': 0,
+      '#about': 1,
+      '#experience': 2,
+      '#portfolio': 3,
+      '#current-work': 4,
+      '#skills': 5,
+      '#contact': 6
+    };
+    return sectionMap[href] ?? 0;
+  };
+
+  const handleNavClick = (href: string, isExternal?: boolean) => {
     setIsMenuOpen(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-    setActiveSection(href);
+    if (isExternal) {
+      window.location.href = href;
+    } else {
+      try {
+        const sectionIndex = getSectionIndex(href);
+        console.log(`Navigation clicked: ${href} -> Section ${sectionIndex}`);
+        navigateToSection(sectionIndex);
+        setActiveSection(href);
+      } catch (error) {
+        console.error('Navigation error:', error);
+        // Fallback to traditional scrolling if context not available
+        document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+        setActiveSection(href);
+      }
+    }
   };
 
   return (
@@ -84,7 +117,7 @@ const Header: React.FC = () => {
 
       <NavbarContent className="hidden sm:flex gap-2" justify="center">
         {navItems.map((item, index) => (
-          <NavbarItem key={item.name} isActive={activeSection === item.href}>
+          <NavbarItem key={item.name} isActive={!item.external && activeSection === item.href}>
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -97,6 +130,8 @@ const Header: React.FC = () => {
                 className={`px-3 py-2 text-sm transition-all duration-300 cursor-pointer ${
                   item.href === '#contact'
                     ? 'bg-indigo-600 hover:bg-indigo-700 text-white rounded-full'
+                    : item.external
+                    ? 'bg-purple-600 hover:bg-purple-700 text-white rounded-full'
                     : `rounded-md ${
                         activeSection === item.href
                           ? "text-white"
@@ -104,13 +139,17 @@ const Header: React.FC = () => {
                       }`
                 }`}
                 onClick={(e: React.MouseEvent) => {
-                  e.preventDefault();
-                  handleNavClick(item.href);
+                  if (!item.external) {
+                    e.preventDefault();
+                    handleNavClick(item.href, false);
+                  } else {
+                    handleNavClick(item.href, true);
+                  }
                 }}
               >
                 {item.name}
               </Link>
-              {activeSection === item.href && (
+              {!item.external && activeSection === item.href && (
                 <motion.div
                   className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500"
                   layoutId="underline"
@@ -128,13 +167,21 @@ const Header: React.FC = () => {
         {navItems.map((item, index) => (
           <NavbarMenuItem key={`${item.name}-${index}`}>
             <Link
-              color={activeSection === item.href ? "primary" : "foreground"}
-              className="w-full text-gray-300 hover:text-indigo-400 transition-colors duration-200 cursor-pointer"
+              color={!item.external && activeSection === item.href ? "primary" : "foreground"}
+              className={`w-full transition-colors duration-200 cursor-pointer ${
+                item.external 
+                  ? "text-purple-400 hover:text-purple-300" 
+                  : "text-gray-300 hover:text-indigo-400"
+              }`}
               href={item.href}
               size="lg"
               onClick={(e: React.MouseEvent) => {
-                e.preventDefault();
-                handleNavClick(item.href);
+                if (!item.external) {
+                  e.preventDefault();
+                  handleNavClick(item.href, false);
+                } else {
+                  handleNavClick(item.href, true);
+                }
               }}
             >
               {item.name}
