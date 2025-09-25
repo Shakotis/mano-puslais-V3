@@ -87,15 +87,23 @@ const CurrentWork: React.FC = () => {
                   </div>
                 </div>
 
-                <Progress 
-                  aria-label="Project Progress" 
-                  size="md" 
-                  value={overallProgress} 
-                  color="primary"
-                  className="mt-4"
-                  label={`Progress: ${overallProgress}%`}
-                  showValueLabel={true}
-                />
+                <div className="mt-4 mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-300">Development Progress</span>
+                    <span className="text-sm text-gray-400">{overallProgress || 40}%</span>
+                  </div>
+                  <Progress 
+                    aria-label="Camera Control Platform Progress" 
+                    size="lg" 
+                    value={overallProgress || 40} 
+                    color="warning"
+                    className="w-full"
+                    classNames={{
+                      track: "drop-shadow-md border border-gray-600/30 bg-gray-800/50",
+                      indicator: "bg-gradient-to-r from-amber-400 to-orange-500"
+                    }}
+                  />
+                </div>
               </div>
             </CardHeader>
 
