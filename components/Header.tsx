@@ -5,34 +5,34 @@ import {
   Navbar, 
   NavbarBrand, 
   NavbarContent, 
-  NavbarItem, 
-  NavbarMenuToggle, 
-  NavbarMenu, 
-  NavbarMenuItem 
+  NavbarItem
 } from "@heroui/navbar";
 import { Link } from "@heroui/link";
+import { Button } from "@heroui/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+} from "@heroui/drawer";
 import { motion } from "framer-motion";
-import { ProjectProgressDisplay } from "@/components/ProjectProgressDisplay";
-const Header: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("#hero");
+import { FaBars, FaTimes } from "react-icons/fa";
 
-  const navItems: Array<{name: string; href: string; external?: boolean}> = [
+const Header: React.FC = () => {
+  const [activeSection, setActiveSection] = useState("#hero");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const navItems = [
     { name: "Home", href: "#hero" },
     { name: "About", href: "#about" },
     { name: "Experience", href: "#experience" },
     { name: "Portfolio", href: "#portfolio" },
-    { name: "3D Gallery", href: "/gallery", external: true },
-    { name: "Currently Working On", href: "#current-work" },
     { name: "Skills", href: "#skills" },
     { name: "Contact", href: "#contact" },
   ];
 
   useEffect(() => {
-    // Filter out external links and only observe internal anchor links
-    const internalNavItems = navItems.filter(item => !item.external);
-    const sections = internalNavItems.map(item => document.querySelector(item.href));
-
+    const sections = navItems.map(item => document.querySelector(item.href));
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -41,10 +41,7 @@ const Header: React.FC = () => {
           }
         });
       },
-      {
-        rootMargin: "-50% 0px -50% 0px",
-        threshold: 0,
-      }
+      { rootMargin: "-50% 0px -50% 0px", threshold: 0 }
     );
 
     sections.forEach((section) => {
@@ -58,141 +55,120 @@ const Header: React.FC = () => {
     };
   }, []);
 
-  const handleNavClick = (href: string, isExternal?: boolean) => {
-    setIsMenuOpen(false);
-    if (isExternal) {
-      window.location.href = href;
-    } else {
-      // Use conventional scrolling
-      document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-      setActiveSection(href);
-    }
+  const handleNavClick = (href: string) => {
+    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    setActiveSection(href);
+    setIsDrawerOpen(false);
   };
 
   return (
-    <Navbar 
-      onMenuOpenChange={setIsMenuOpen}
-      isMenuOpen={isMenuOpen}
-      className="fixed top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800/50"
-      maxWidth="xl"
-      shouldHideOnScroll
-      height="4rem"
-    >
-      <NavbarContent>
-        <NavbarMenuToggle
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="sm:hidden text-gray-100 hover:text-indigo-400 transition-colors duration-200 p-2 rounded-lg hover:bg-gray-800/50"
-        />
-        <NavbarBrand>
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center space-x-2 sm:space-x-4"
-          >
-            <p className="font-bold text-base sm:text-lg text-gray-100 truncate">Dovydas Jusevičius</p>
-            <div className="hidden lg:block">
-              <ProjectProgressDisplay variant="mini" />
-            </div>
-          </motion.div>
-        </NavbarBrand>
-      </NavbarContent>
-
-      <NavbarContent className="hidden sm:flex gap-2" justify="center">
-        {navItems.map((item, index) => (
-          <NavbarItem key={item.name} isActive={!item.external && activeSection === item.href}>
+    <>
+      <Navbar 
+        className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-gray-800/50"
+        maxWidth="full"
+        height="72px"
+      >
+        <NavbarContent>
+          <NavbarBrand>
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
             >
-              <Link
-                color="foreground"
-                href={item.href}
-                className={`px-3 py-2 text-sm transition-all duration-300 cursor-pointer rounded-md ${
-                  activeSection === item.href
-                    ? "text-white"
-                    : "text-gray-400 hover:text-white"
-                }`}
-                onClick={(e: React.MouseEvent) => {
-                  if (!item.external) {
-                    e.preventDefault();
-                    handleNavClick(item.href, false);
-                  } else {
-                    handleNavClick(item.href, true);
-                  }
-                }}
-              >
-                {item.name}
-              </Link>
-              {!item.external && activeSection === item.href && (
-                <motion.div
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500"
-                  layoutId="underline"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-              )}
+              <p className="font-bold text-xl text-white">Dovydas Jusevičius</p>
             </motion.div>
-          </NavbarItem>
-        ))}
-      </NavbarContent>
+          </NavbarBrand>
+        </NavbarContent>
 
-      <NavbarMenu className="bg-gray-950/95 backdrop-blur-md pt-6">
-        <div className="flex flex-col space-y-1">
-          {/* Mobile Progress Display */}
-          <div className="px-4 pb-4 mb-4 border-b border-gray-800">
-            <div className="md:hidden">
-              <ProjectProgressDisplay variant="mini" className="justify-center" />
-            </div>
-          </div>
-          
+        <NavbarContent className="hidden xl:flex gap-4" justify="center">
           {navItems.map((item, index) => (
-            <NavbarMenuItem key={`${item.name}-${index}`} className="px-2">
+            <NavbarItem key={item.name} isActive={activeSection === item.href}>
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="w-full"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative"
               >
                 <Link
-                  color={!item.external && activeSection === item.href ? "primary" : "foreground"}
-                  className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200 cursor-pointer ${
-                    !item.external && activeSection === item.href 
-                      ? "bg-indigo-600/20 text-indigo-300 border-l-4 border-indigo-500" 
-                      : item.external
-                      ? "text-purple-400 hover:text-purple-300 hover:bg-purple-600/10" 
-                      : "text-gray-300 hover:text-indigo-400 hover:bg-indigo-600/10"
-                  }`}
                   href={item.href}
-                  size="lg"
+                  className={`px-3 py-2 text-base transition-colors duration-300 rounded-md ${
+                    activeSection === item.href
+                      ? "text-white font-semibold"
+                      : "text-gray-400 hover:text-white"
+                  }`}
                   onClick={(e: React.MouseEvent) => {
-                    if (!item.external) {
-                      e.preventDefault();
-                      handleNavClick(item.href, false);
-                    } else {
-                      handleNavClick(item.href, true);
-                    }
+                    e.preventDefault();
+                    handleNavClick(item.href);
                   }}
                 >
-                  <span className="font-medium">{item.name}</span>
-                  {item.external && (
-                    <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  )}
-                  {!item.external && activeSection === item.href && (
-                    <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" />
-                  )}
+                  {item.name}
                 </Link>
+                {activeSection === item.href && (
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500 rounded-full"
+                    layoutId="underline"
+                  />
+                )}
               </motion.div>
-            </NavbarMenuItem>
+            </NavbarItem>
           ))}
-        </div>
-      </NavbarMenu>
-    </Navbar>
+        </NavbarContent>
+
+        <NavbarContent justify="end">
+          <NavbarItem className="xl:hidden">
+            <Button
+              isIconOnly
+              variant="light"
+              onClick={() => setIsDrawerOpen(true)}
+              className="text-gray-100 hover:text-indigo-400 transition-colors"
+            >
+              <FaBars className="w-6 h-6" />
+            </Button>
+          </NavbarItem>
+        </NavbarContent>
+      </Navbar>
+
+      <Drawer 
+        isOpen={isDrawerOpen} 
+        size="full" 
+        onClose={() => setIsDrawerOpen(false)}
+        className="xl:hidden"
+      >
+        <DrawerContent className="bg-black/90 text-gray-100">
+          <DrawerHeader className="flex items-center justify-between p-6 border-b border-gray-800">
+            <h2 className="text-2xl font-bold text-white">Navigation</h2>
+            <Button
+              isIconOnly
+              variant="light"
+              onClick={() => setIsDrawerOpen(false)}
+              className="text-gray-400 hover:text-white"
+            >
+              <FaTimes className="w-6 h-6" />
+            </Button>
+          </DrawerHeader>
+          <DrawerBody className="p-6">
+            <div className="flex flex-col gap-6">
+              {navItems.map((item, index) => (
+                <motion.button
+                  key={item.name}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  onClick={() => handleNavClick(item.href)}
+                  className={`w-full text-left text-2xl font-semibold transition-colors duration-300 ${
+                    activeSection === item.href 
+                      ? "text-indigo-400" 
+                      : "text-gray-300 hover:text-indigo-400"
+                  }`}
+                >
+                  {item.name}
+                </motion.button>
+              ))}
+            </div>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 };
 

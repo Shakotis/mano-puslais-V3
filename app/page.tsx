@@ -6,51 +6,45 @@ import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Timeline from "@/components/Timeline";
 import Portfolio from "@/components/Portfolio";
-import CurrentWork from "@/components/CurrentWork";
 import Skills from "@/components/Skills";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-
+import RocketScrollToTop from "@/components/RocketScrollToTop";
 
 export default function Home() {
   return (
-      <div className="min-h-screen bg-transparent text-gray-100 relative">
-        {/* 3D Scroll Background with Content */}
-        {/* 3D Background Component - now just provides visual background */}
-        <ThreeBackground />
-        
-        {/* Fixed Navigation Header */}
-        <Header />
-        
-        {/* Content sections with conventional scrolling */}
-        <section id="hero" className="min-h-screen relative">
+    <div className="bg-transparent text-gray-100 relative">
+      <ThreeBackground />
+      <Header />
+      
+      <main>
+        <section id="hero" className="relative">
           <Hero />
         </section>
         
-        <section id="about" className="py-20 relative">
+        <section id="about" className="py-24 relative">
           <About />
         </section>
         
-        <section id="experience" className="py-20 relative">
+        <section id="experience" className="py-24 relative">
           <Timeline />
         </section>
         
-        <section id="portfolio" className="py-20 relative">
+        <section id="portfolio" className="py-24 relative">
           <Portfolio />
         </section>
         
-        <section id="current-work" className="py-20 relative">
-          <CurrentWork />
-        </section>
-        
-        <section id="skills" className="py-20 relative">
+        <section id="skills" className="py-24 relative">
           <Skills />
         </section>
         
-        <section id="contact" className="py-20 relative">
+        <section id="contact" className="py-24 relative">
           <Contact />
-          <Footer />
         </section>
-      </div>
+      </main>
+      
+      <Footer />
+      <RocketScrollToTop />
+    </div>
   );
 }
