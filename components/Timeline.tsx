@@ -5,6 +5,7 @@ import { Card, CardBody } from "@heroui/card";
 import { Link } from "@heroui/link";
 import { Avatar } from "@heroui/avatar";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { FaCube, FaRobot, FaBuilding, FaCode, FaWrench, FaArrowDown } from "react-icons/fa";
 
 interface TimelineEvent {
@@ -16,6 +17,14 @@ interface TimelineEvent {
   link?: string;
   isProjectLink?: boolean;
   projectId?: string;
+}
+
+interface Software {
+  name: string;
+  src: string;
+  experience: string;
+  period: string;
+  className?: string;
 }
 
 const Timeline: React.FC = () => {
@@ -63,17 +72,17 @@ const Timeline: React.FC = () => {
       date: "2025/08",
       title: "Joined THUNDERCLAP Labs",
       icon: <span className="text-2xl">🔧</span>,
-      description: "Started a position at THUNDERCLAP Labs, contributing to cutting-edge research and development projects.",
+      description: "As a 3D Modeling and Engineering Specialist, I contribute to projects like Cloud Seeding and Rocket Fuel Automation, utilizing skills in SolidWorks, robotics, and 3D printing.",
       isExternal: true,
       link: "https://thunderclaplabs.com"
     }
   ];
 
-  const software = [
-    { name: "FreeCAD", icon: <FaCube className="w-6 h-6 text-indigo-400" />, experience: "2 years", period: "2023 - 2025/01" },
-    { name: "SOLIDWORKS", icon: <FaCube className="w-6 h-6 text-indigo-400" />, experience: "Current - Advanced", period: "2025/01 - Present" },
-    { name: "OpenMotor", icon: <span className="text-2xl">🚀</span>, experience: "Motor Simulation", period: "Since 2025/08" },
-    { name: "OpenRocket", icon: <span className="text-2xl">🚀</span>, experience: "Rocket Simulation", period: "Since 2025/08" }
+  const software: Software[] = [
+    { name: "FreeCAD", src: "/FreeCAD-symbol.svg.png", experience: "2 years", period: "2023 - 2025/01" },
+    { name: "SOLIDWORKS", src: "/SolidWorks logo.jpg", experience: "Current - Advanced", period: "2025/01 - Present", className: "w-48 h-16" },
+    { name: "OpenMotor", src: "/openMotor logo.png", experience: "Motor Simulation", period: "Since 2025/08" },
+    { name: "OpenRocket", src: "/OpenRocket_icon.png", experience: "Rocket Simulation", period: "Since 2025/08" }
   ];
 
   return (
@@ -114,8 +123,8 @@ const Timeline: React.FC = () => {
                 >
                   <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-indigo-500 transition-all duration-300 rounded-xl flex-1" isPressable radius="lg">
                     <CardBody className="p-8 flex flex-col items-center justify-center text-center h-full min-h-[240px]">
-                      <div className="mb-6 flex-shrink-0">
-                        {s.icon}
+                      <div className={`mb-6 flex-shrink-0 relative ${s.className || 'w-16 h-16'}`}>
+                        <Image src={s.src} alt={`${s.name} logo`} layout="fill" objectFit="contain" />
                       </div>
                       <span className="text-2xl font-semibold text-white mb-4 flex-shrink-0">{s.name}</span>
                       <p className="text-base text-gray-300 mb-2 flex-grow flex items-center justify-center text-center">{s.experience}</p>
@@ -145,7 +154,7 @@ const Timeline: React.FC = () => {
                     viewport={{ once: true }}
                     className={`flex items-center w-full mb-8 md:justify-start ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
                   >
-                    <div className="w-full md:w-1/2 md:pr-8">
+                    <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:pr-8' : 'md:pl-8'}`}>
                     <Card 
                       className={`bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-indigo-500 transition-all duration-300 rounded-xl shadow-lg h-full ${
                         (event.isProjectLink || event.isExternal) ? 'cursor-pointer hover:bg-gray-800/70' : ''

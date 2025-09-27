@@ -27,9 +27,10 @@ const Skills: React.FC = () => {
       icon: <FaCube className="w-6 h-6" />,
       color: "indigo",
       skills: [
-        { name: "FreeCAD", details: "FEA, Python macros, Forest Robot Project" },
+        { name: "FreeCAD", details: "FEA, Tracked robot chassis" },
         { name: "SOLIDWORKS", details: "FEA, CFD, Rocket and Drone Projects" },
-        { name: "AutoCAD Electrical", details: "Electrical system design and documentation" }
+        { name: "3D Printing", details: "Prototyping and mechanical parts" },
+        { name: "Laser CNC", details: "Cutting and engraving materials" }
       ]
     },
     {
@@ -37,8 +38,9 @@ const Skills: React.FC = () => {
       icon: <FaMicrochip className="w-6 h-6" />,
       color: "purple",
       skills: [
+        { name: "AutoCAD Electrical", details: "Electrical system design and documentation" },
         { name: "Circuit Analysis", details: "Schematics and circuit design" },
-        { name: "Motor Control", details: "Stepper and potentiometer control" }
+        { name: "Motor Control", details: "DIY stepper motor encoder, Raspberry Pi Pico" }
       ]
     },
     {
@@ -47,7 +49,7 @@ const Skills: React.FC = () => {
       color: "green",
       skills: [
         { name: "C++", details: "Object-oriented programming" },
-        { name: "Python", details: "Raspberry Pi Pico, automation scripts" }
+        { name: "Python", details: "Raspberry Pi Pico side projects, FreeCAD automation scripts" }
       ]
     },
     {
@@ -55,9 +57,8 @@ const Skills: React.FC = () => {
       icon: <FaTools className="w-6 h-6" />,
       color: "orange",
       skills: [
-        { name: "3D Printing", details: "Prototyping and mechanical parts" },
-        { name: "Welding", details: "Stick welding techniques" },
         { name: "Machining", details: "Milling, drilling, threading" },
+        { name: "Welding", details: "Stick welding techniques" },
         { name: "Soldering", details: "Component assembly and repair" }
       ]
     },
@@ -68,7 +69,6 @@ const Skills: React.FC = () => {
       skills: [
         { name: "Aerodynamics", details: "Fluid dynamics and flight" },
         { name: "Project Management", details: "ClickUp for task organization" },
-        { name: "English", details: "B2+ technical communication" }
       ]
     }
   ];
@@ -171,24 +171,24 @@ const Skills: React.FC = () => {
                   className="h-full"
                 >
                   <Card 
-                    className={`${getColorClass(category.color)} backdrop-blur-sm border transition-all duration-300 h-full`}
+                    className={`bg-gray-900/50 backdrop-blur-sm border ${getColorClass(category.color)} transition-all duration-300 w-full flex flex-col rounded-xl h-full`}
                     isHoverable
                     radius="lg"
                   >
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center space-x-3 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
-                        <div className={`${getIconColor(category.color)} bg-gray-900/50 p-2 rounded-lg`}>
+                    <CardHeader className="p-6">
+                      <div className="flex items-center space-x-4">
+                        <div className={`p-3 rounded-lg bg-gray-800/50 ${getIconColor(category.color)}`}>
                           {category.icon}
                         </div>
-                        <h3 className="text-xl font-bold text-gray-100">
+                        <h3 className="text-xl font-bold text-white">
                           {category.title}
                         </h3>
                       </div>
                     </CardHeader>
                     
-                    <Divider className="opacity-30" />
+                    <Divider className="opacity-20" />
                     
-                    <CardBody className="pt-4">
+                    <CardBody className="p-6 flex-1">
                       <div className="space-y-4">
                         {category.skills.map((skill, skillIndex) => (
                           <motion.div
@@ -198,18 +198,10 @@ const Skills: React.FC = () => {
                             transition={{ duration: 0.5, delay: skillIndex * 0.1 }}
                             viewport={{ once: true }}
                           >
-                            <Card
-                              className="bg-gray-800/30 border-gray-700/50"
-                              radius="lg"
-                              shadow="sm"
-                            >
-                              <CardBody className="p-4">
-                                <div className="bg-gray-800/40 p-4 rounded-lg border border-gray-700/50 hover:bg-gray-800/70 transition-colors">
-                                  <p className="font-semibold text-white mb-1">{skill.name}</p>
-                                  <p className="text-gray-400 text-sm">{skill.details}</p>
-                                </div>
-                              </CardBody>
-                            </Card>
+                            <div className="bg-gray-800/40 p-4 rounded-lg border border-gray-700/50 hover:bg-gray-800/70 transition-colors">
+                              <p className="font-semibold text-white mb-1">{skill.name}</p>
+                              <p className="text-gray-400 text-sm">{skill.details}</p>
+                            </div>
                           </motion.div>
                         ))}
                       </div>

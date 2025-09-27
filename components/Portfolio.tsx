@@ -208,31 +208,7 @@ const Portfolio: React.FC = () => {
                           </Button>
                         ) : (
                           // Other projects: Default options
-                          <div className="space-y-2">
-                            <Button
-                              as="a"
-                              href={project.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg"
-                              radius="full"
-                              startContent={<FaExternalLinkAlt className="w-4 h-4" />}
-                            >
-                              View Project
-                            </Button>
-                            <Button
-                              as="a"
-                              href={project.downloadLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              variant="bordered"
-                              className="w-full border-2 border-indigo-500/50 text-indigo-300 hover:bg-gradient-to-r hover:from-indigo-600/20 hover:to-purple-600/20 hover:border-indigo-400 shadow-md"
-                              radius="full"
-                              startContent={<FaDownload className="w-4 h-4" />}
-                            >
-                              Download Files
-                            </Button>
-                          </div>
+                          null
                         )}
                       </div>
                     </AccordionItem>
@@ -260,7 +236,7 @@ const Portfolio: React.FC = () => {
                   More Projects Coming Soon
                 </h3>
                 <p className="text-gray-500 text-base leading-relaxed">
-                  I'm always working on something new. Stay tuned for more exciting projects!
+                  I'm always working on something new.
                 </p>
               </div>
             </Card>
