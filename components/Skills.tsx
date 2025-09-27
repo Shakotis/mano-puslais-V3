@@ -105,8 +105,10 @@ const Skills: React.FC = () => {
           <div className="w-24 h-1 bg-indigo-500 mx-auto"></div>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
-          {skillCategories.map((category, categoryIndex) => (
+        <div className="flex flex-col gap-8">
+          {/* Top row with 3 columns (33% width each) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {skillCategories.slice(0, 3).map((category, categoryIndex) => (
             <motion.div
               key={category.title}
               initial={{ opacity: 0, y: 30 }}
@@ -154,6 +156,69 @@ const Skills: React.FC = () => {
               </Card>
             </motion.div>
           ))}
+          </div>
+          
+          {/* Bottom row with 2 centered columns */}
+          <div className="flex justify-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl w-full">
+              {skillCategories.slice(3, 5).map((category, categoryIndex) => (
+                <motion.div
+                  key={category.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: (categoryIndex + 3) * 0.1 }}
+                  viewport={{ once: true }}
+                  className="h-full"
+                >
+                  <Card 
+                    className={`${getColorClass(category.color)} backdrop-blur-sm border transition-all duration-300 h-full`}
+                    isHoverable
+                    radius="lg"
+                  >
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center space-x-3 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
+                        <div className={`${getIconColor(category.color)} bg-gray-900/50 p-2 rounded-lg`}>
+                          {category.icon}
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-100">
+                          {category.title}
+                        </h3>
+                      </div>
+                    </CardHeader>
+                    
+                    <Divider className="opacity-30" />
+                    
+                    <CardBody className="pt-4">
+                      <div className="space-y-4">
+                        {category.skills.map((skill, skillIndex) => (
+                          <motion.div
+                            key={skill.name}
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: skillIndex * 0.1 }}
+                            viewport={{ once: true }}
+                          >
+                            <Card
+                              className="bg-gray-800/30 border-gray-700/50"
+                              radius="lg"
+                              shadow="sm"
+                            >
+                              <CardBody className="p-4">
+                                <div className="bg-gray-800/40 p-4 rounded-lg border border-gray-700/50 hover:bg-gray-800/70 transition-colors">
+                                  <p className="font-semibold text-white mb-1">{skill.name}</p>
+                                  <p className="text-gray-400 text-sm">{skill.details}</p>
+                                </div>
+                              </CardBody>
+                            </Card>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </CardBody>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

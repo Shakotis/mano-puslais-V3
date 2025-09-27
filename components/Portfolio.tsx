@@ -80,17 +80,15 @@ const Portfolio: React.FC = () => {
                         {project.title}
                       </h3>
                       <Chip 
-                        size="sm" 
-                        variant="flat" 
                         color={
                           project.status === "Completed" ? "success" :
                           project.status === "Currently Working" ? "primary" :
                           "warning"
                         } 
                         className={
-                          project.status === "Completed" ? "text-green-300 bg-green-900/50" :
-                          project.status === "Currently Working" ? "text-blue-300 bg-blue-900/50" :
-                          "text-yellow-300 bg-yellow-900/50"
+                          project.status === "Completed" ? "text-green-300 bg-green-900/50 px-3" :
+                          project.status === "Currently Working" ? "text-blue-300 bg-blue-900/50 px-3" :
+                          "text-yellow-300 bg-yellow-900/50 px-3"
                         }
                       >
                         {project.status}
@@ -129,11 +127,10 @@ const Portfolio: React.FC = () => {
                         key={tech.name}
                         size="sm"
                         variant="shadow"
-                        radius="md"
                         startContent={tech.icon}
                         classNames={{
-                          base: "bg-indigo-900/40 border-indigo-500/50",
-                          content: "text-indigo-300 font-medium"
+                          base: "bg-indigo-900/40 border-indigo-500/50 px-3",
+                          content: "text-indigo-300 font-medium pl-3"
                         }}
                       >
                         {tech.name}
@@ -203,8 +200,8 @@ const Portfolio: React.FC = () => {
                             href={project.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-                            radius="md"
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg"
+                            radius="full"
                             startContent={<FaExternalLinkAlt className="w-4 h-4" />}
                           >
                             View Project Page
@@ -217,8 +214,8 @@ const Portfolio: React.FC = () => {
                               href={project.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-                              radius="md"
+                              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg"
+                              radius="full"
                               startContent={<FaExternalLinkAlt className="w-4 h-4" />}
                             >
                               View Project
@@ -229,8 +226,8 @@ const Portfolio: React.FC = () => {
                               target="_blank"
                               rel="noopener noreferrer"
                               variant="bordered"
-                              className="w-full border-indigo-600 text-indigo-400 hover:bg-indigo-600 hover:text-white"
-                              radius="md"
+                              className="w-full border-2 border-indigo-500/50 text-indigo-300 hover:bg-gradient-to-r hover:from-indigo-600/20 hover:to-purple-600/20 hover:border-indigo-400 shadow-md"
+                              radius="full"
                               startContent={<FaDownload className="w-4 h-4" />}
                             >
                               Download Files
@@ -254,7 +251,7 @@ const Portfolio: React.FC = () => {
             whileHover={{ y: -5 }}
             className="flex"
           >
-            <Card className="bg-gray-900/30 border-2 border-dashed border-gray-700 hover:border-indigo-500 transition-all duration-300 w-full h-[800px] flex flex-col items-center justify-center rounded-xl" isPressable radius="lg">
+            <Card className="bg-gray-900/30 border-2 border-dashed border-gray-700 w-full h-[800px] flex flex-col items-center justify-center rounded-xl" radius="lg">
               <div className="text-center p-8">
                 <div className="text-gray-500 mb-4">
                   <FaCube className="w-16 h-16 mx-auto" />

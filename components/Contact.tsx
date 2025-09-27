@@ -46,47 +46,43 @@ const Contact: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl shadow-lg" isPressable radius="lg">
-              <CardBody className="p-10">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
-                  {contactInfo.map((info, index) => (
-                    <motion.div
-                      key={info.title}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.1 * index }}
-                      viewport={{ once: true }}
-                      className="flex flex-col items-center text-center w-full max-w-xs"
-                    >
-                      <div className="text-indigo-400 mb-4">
-                        {info.icon}
-                      </div>
-                      <h4 className="text-xl font-semibold text-white mb-2">
-                        {info.title}
-                      </h4>
-                      {info.href ? (
-                        <a
-                          href={info.href}
-                          className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-lg"
-                        >
-                          {info.value}
-                        </a>
-                      ) : (
-                        <span className="text-gray-300 text-lg">{info.value}</span>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              </CardBody>
-            </Card>
-          </motion.div>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {contactInfo.map((info, index) => (
+              <motion.div
+                key={info.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 * index }}
+                viewport={{ once: true }}
+              >
+                <Card 
+                  className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-indigo-500 transition-all duration-300 rounded-xl shadow-lg h-full" 
+                  isHoverable 
+                  radius="lg"
+                >
+                  <CardBody className="p-8 flex flex-col items-center text-center h-full justify-center">
+                    <div className="text-indigo-400 mb-6 p-4 bg-indigo-900/20 rounded-full">
+                      {info.icon}
+                    </div>
+                    <h4 className="text-xl font-semibold text-white mb-4">
+                      {info.title}
+                    </h4>
+                    {info.href ? (
+                      <a
+                        href={info.href}
+                        className="text-gray-300 hover:text-indigo-400 transition-colors duration-200 text-lg break-all"
+                      >
+                        {info.value}
+                      </a>
+                    ) : (
+                      <span className="text-gray-300 text-lg">{info.value}</span>
+                    )}
+                  </CardBody>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

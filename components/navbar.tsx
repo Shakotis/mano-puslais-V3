@@ -50,14 +50,8 @@ export const Navbar = () => {
 
   return (
     <HeroUINavbar maxWidth="xl" position="sticky">
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo />
-            <p className="font-bold text-inherit">ACME</p>
-          </NextLink>
-        </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
+      <NavbarContent className="basis-1/5 sm:basis-full" justify="end">
+        <ul className="hidden lg:flex gap-4 justify-end mr-2">
           {siteConfig.navItems.map((item) => (
             <NavbarItem key={item.href}>
               <NextLink
@@ -73,6 +67,12 @@ export const Navbar = () => {
             </NavbarItem>
           ))}
         </ul>
+        <NavbarBrand as="li" className="gap-3 max-w-fit">
+          <NextLink className="flex justify-end items-center gap-1" href="/">
+            <Logo />
+            <p className="font-bold text-inherit">ACME</p>
+          </NextLink>
+        </NavbarBrand>
       </NavbarContent>
 
       <NavbarContent

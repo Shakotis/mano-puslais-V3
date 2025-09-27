@@ -183,10 +183,10 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
       loader.load(
         stlFile,
         (geometry) => {
-          const material = new THREE.MeshPhongMaterial({ 
-            color: 0x888888, // Neutral gray like SOLIDWORKS default
-            shininess: 30,   // Lower shininess for more matte finish
-            specular: 0x222222 // Subtle specular highlights
+          const material = new THREE.MeshBasicMaterial({ 
+            color: 0x00ff88, // Bright green wireframe like CAD software
+            wireframe: true,
+            wireframeLinewidth: 1
           });
           const mesh = new THREE.Mesh(geometry, material);
           

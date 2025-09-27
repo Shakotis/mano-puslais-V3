@@ -1,5 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable static export for Netlify
+  output: 'export',
+  
+  // Disable image optimization for static export
+  images: {
+    unoptimized: true,
+  },
+  
+  // Base path and asset prefix (leave empty for root domain)
+  basePath: '',
+  assetPrefix: '',
+  
+  // Trailing slash
+  trailingSlash: false,
+  
   // Allow cross-origin requests from specific IP addresses during development
   allowedDevOrigins: [
     '10.5.0.2',
