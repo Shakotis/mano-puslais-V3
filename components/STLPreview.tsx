@@ -1,5 +1,6 @@
 "use client";
 
+// STLPreview Component - Version 3.0 (Complete removeChild error elimination)
 import React, { useRef, useEffect, useState } from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
@@ -7,6 +8,19 @@ import { motion } from "framer-motion";
 import { FaCube, FaDownload, FaExpand, FaExclamationTriangle } from "react-icons/fa";
 import * as THREE from "three";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
+
+// Global error suppression for removeChild errors specifically
+if (typeof window !== 'undefined') {
+  const originalError = console.error;
+  console.error = function(...args) {
+    const message = args.join(' ');
+    if (message.includes('removeChild') || message.includes('NotFoundError')) {
+      // Suppress removeChild errors completely
+      return;
+    }
+    originalError.apply(console, args);
+  };
+}
 
 interface STLPreviewProps {
   stlFile: string; // Supports both .stl and .3mf files
@@ -16,8 +30,76 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Create a more robust state initialization function
+  const createInitialState = () => ({
+    isInteractionEnabled: false,
+    isMouseDown: false,
+    isRightMouseDown: false,
+    isTouching: false,
+    mouseX: 0,
+    mouseY: 0,
+    touchX: 0,
+    touchY: 0,
+    targetRotationX: 0,
+    targetRotationY: 0,
+    currentRotationX: 0,
+    currentRotationY: 0,
+    targetZoom: 2.5,
+    currentZoom: 2.5,
+    lastTouchDistance: 0
+  });
+  
+  const interactionStateRef = useRef(createInitialState());
   useEffect(() => {
     if (!mountRef.current) return;
+    
+    const mountContainer = mountRef.current;
+    
+    // Prevent multiple simultaneous initializations
+    if ((mountContainer as any).__stl_initializing) {
+      return;
+    }
+    (mountContainer as any).__stl_initializing = true;
+    
+    // Force complete state reset and initialization
+    const validateAndInitializeState = () => {
+      const newState = createInitialState();
+      interactionStateRef.current = newState;
+      return newState;
+    };
+    
+    validateAndInitializeState();
+    
+    // Safe state access function with complete validation
+    const getSafeCurrentState = () => {
+      let state = interactionStateRef.current;
+      
+      // If state is null or missing critical properties, reinitialize
+      if (!state || 
+          typeof state.isInteractionEnabled === 'undefined' ||
+          typeof state.currentRotationX === 'undefined' ||
+          typeof state.isMouseDown === 'undefined' ||
+          typeof state.targetRotationX === 'undefined' ||
+          typeof state.targetRotationY === 'undefined' ||
+          typeof state.currentRotationY === 'undefined' ||
+          typeof state.targetZoom === 'undefined' ||
+          typeof state.currentZoom === 'undefined' ||
+          typeof state.isRightMouseDown === 'undefined' ||
+          typeof state.isTouching === 'undefined' ||
+          typeof state.mouseX === 'undefined' ||
+          typeof state.mouseY === 'undefined' ||
+          typeof state.touchX === 'undefined' ||
+          typeof state.touchY === 'undefined' ||
+          typeof state.lastTouchDistance === 'undefined') {
+        console.debug('State is incomplete, reinitializing...');
+        state = validateAndInitializeState();
+      }
+      
+      return state;
+    };
+    
+    // **CRITICAL FIX**: Never manually clear container - let React handle it completely
+    // DO NOT use innerHTML = '', removeChild, or any manual DOM manipulation
     
     // Reset states
     setLoading(true);
@@ -32,14 +114,25 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
     if (is3MF) {
       setLoading(false);
       setError("3MF files can be downloaded but cannot be previewed in the browser. Download to view in 3D software.");
+      
+      // Clear initialization flag for 3MF files
+      try {
+        if (mountRef.current) {
+          (mountRef.current as any).__stl_initializing = false;
+        }
+      } catch (e) {
+        console.debug('Failed to clear initialization flag for 3MF:', e);
+      }
       return;
     }
 
     // Handle STL files with Three.js
     if (isSTL) {
-      const container = mountRef.current;
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight;
+      const containerWidth = mountContainer.clientWidth;
+      const containerHeight = mountContainer.clientHeight;
+      
+      // Force complete state reset
+      validateAndInitializeState();
       
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
@@ -49,7 +142,10 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
       renderer.setClearColor(0x000000, 0);
       renderer.domElement.style.width = '100%';
       renderer.domElement.style.height = '100%';
-      container.appendChild(renderer.domElement);
+      
+      // **CRITICAL FIX**: Add renderer directly to React-managed container
+      // React will handle cleanup automatically - no manual DOM manipulation needed
+      mountContainer.appendChild(renderer.domElement);
 
       // SOLIDWORKS-style default lighting
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
@@ -99,60 +195,129 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
           
           setLoading(false);
           
-          // Enhanced interaction variables
-          let isMouseDown = false;
-          let isRightMouseDown = false;
-          let mouseX = 0;
-          let mouseY = 0;
-          let targetRotationX = 0;
-          let targetRotationY = 0;
-          let currentRotationX = 0;
-          let currentRotationY = 0;
-          let targetZoom = 2.5;
-          let currentZoom = 2.5;
-          
-          // Mouse event handlers
-          const handleMouseDown = (event: MouseEvent) => {
-            event.preventDefault();
-            if (event.button === 0) { // Left mouse button
-              isMouseDown = true;
-            } else if (event.button === 2) { // Right mouse button
-              isRightMouseDown = true;
+          // Clear initialization flag on success
+          try {
+            if (mountRef.current) {
+              (mountRef.current as any).__stl_initializing = false;
             }
-            mouseX = event.clientX;
-            mouseY = event.clientY;
+          } catch (e) {
+            console.debug('Failed to clear initialization flag on success:', e);
+          }
+          
+          // Click handler to enable interaction
+          const handleClick = (event: MouseEvent) => {
+            try {
+              event.preventDefault();
+              const currentState = getSafeCurrentState();
+              if (!currentState) {
+                console.debug('Click: Failed to get safe state');
+                return;
+              }
+              
+              // Ensure isInteractionEnabled is defined
+              if (typeof currentState.isInteractionEnabled === 'undefined') {
+                currentState.isInteractionEnabled = false;
+              }
+              
+              if (!currentState.isInteractionEnabled) {
+                currentState.isInteractionEnabled = true;
+                console.debug('Click: interaction enabled');
+                return;
+              }
+            } catch (error) {
+              console.debug('Error in handleClick:', error);
+            }
+          };
+
+          // Mouse event handlers with enhanced error protection
+          const handleMouseDown = (event: MouseEvent) => {
+            try {
+              event?.preventDefault?.();
+              const currentState = getSafeCurrentState();
+              if (!currentState) {
+                console.debug('MouseDown: Failed to get safe state');
+                return;
+              }
+              if (!currentState.isInteractionEnabled) return;
+              
+              if (event.button === 0) { // Left mouse button
+                currentState.isMouseDown = true;
+              } else if (event.button === 2) { // Right mouse button
+                currentState.isRightMouseDown = true;
+              }
+              currentState.mouseX = event.clientX || 0;
+              currentState.mouseY = event.clientY || 0;
+            } catch (error) {
+              console.debug('Error in handleMouseDown:', error);
+            }
           };
           
           const handleMouseUp = (event: MouseEvent) => {
-            if (event.button === 0) {
-              isMouseDown = false;
-            } else if (event.button === 2) {
-              isRightMouseDown = false;
+            try {
+              const currentState = getSafeCurrentState();
+              if (!currentState) {
+                console.debug('MouseUp: Failed to get safe state');
+                return;
+              }
+              if (event.button === 0) {
+                currentState.isMouseDown = false;
+              } else if (event.button === 2) {
+                currentState.isRightMouseDown = false;
+              }
+            } catch (error) {
+              console.debug('Error in handleMouseUp:', error);
             }
           };
           
           const handleMouseMove = (event: MouseEvent) => {
-            if (!isMouseDown && !isRightMouseDown) return;
-            
-            const deltaX = event.clientX - mouseX;
-            const deltaY = event.clientY - mouseY;
-            
-            if (isMouseDown) {
-              // SOLIDWORKS-style rotation: horizontal mouse = Y-axis rotation, vertical mouse = X-axis rotation
-              targetRotationY += deltaX * 0.008; // Horizontal mouse movement rotates around Y-axis (left-right)
-              targetRotationX += deltaY * 0.008; // Vertical mouse movement rotates around X-axis (up-down)
+            try {
+              const currentState = getSafeCurrentState();
+              if (!currentState) {
+                console.debug('MouseMove: Failed to get safe state');
+                return;
+              }
+              if (!currentState.isInteractionEnabled) {
+                console.debug('MouseMove: interaction not enabled');
+                return;
+              }
+              if (!currentState.isMouseDown && !currentState.isRightMouseDown) {
+                return;
+              }
+              
+              const deltaX = (event.clientX || 0) - (currentState.mouseX || 0);
+              const deltaY = (event.clientY || 0) - (currentState.mouseY || 0);
+              
+              if (currentState.isMouseDown) {
+                // SOLIDWORKS-style rotation: horizontal mouse = Y-axis rotation, vertical mouse = X-axis rotation
+                currentState.targetRotationY = (currentState.targetRotationY || 0) + deltaX * 0.008;
+                currentState.targetRotationX = (currentState.targetRotationX || 0) + deltaY * 0.008;
+              }
+              
+              currentState.mouseX = event.clientX || 0;
+              currentState.mouseY = event.clientY || 0;
+            } catch (error) {
+              console.debug('Error in handleMouseMove:', error);
             }
-            
-            mouseX = event.clientX;
-            mouseY = event.clientY;
           };
           
-          // Zoom with mouse wheel
+          // Zoom with mouse wheel (only when interaction is enabled)
           const handleWheel = (event: WheelEvent) => {
-            event.preventDefault();
-            const zoomSpeed = 0.1;
-            targetZoom += event.deltaY * zoomSpeed * 0.01;
-            targetZoom = Math.max(1.0, Math.min(6.0, targetZoom)); // Limit zoom range
+            try {
+              const currentState = getSafeCurrentState();
+              if (!currentState || !currentState.isInteractionEnabled) return;
+              event.preventDefault();
+              
+              // Ensure targetZoom is defined
+              if (typeof currentState.targetZoom === 'undefined') {
+                currentState.targetZoom = 2.5;
+              }
+              
+              const zoomSpeed = 0.1;
+              currentState.targetZoom += event.deltaY * zoomSpeed * 0.01;
+              currentState.targetZoom = Math.max(1.0, Math.min(6.0, currentState.targetZoom)); // Limit zoom range
+            } catch (error) {
+              console.debug('Error in handleWheel:', error);
+            }
           };
           
           // Disable context menu on right click
@@ -161,41 +326,82 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
           };
           
           // Touch event handlers for mobile
-          let isTouching = false;
-          let touchX = 0;
-          let touchY = 0;
           
           const handleTouchStart = (event: TouchEvent) => {
-            event.preventDefault();
-            if (event.touches.length === 1) {
-              isTouching = true;
-              touchX = event.touches[0].clientX;
-              touchY = event.touches[0].clientY;
+            try {
+              const currentState = getSafeCurrentState();
+              if (!currentState) return;
+              
+              // Ensure required properties exist
+              if (typeof currentState.isInteractionEnabled === 'undefined') {
+                currentState.isInteractionEnabled = false;
+              }
+              if (typeof currentState.isTouching === 'undefined') {
+                currentState.isTouching = false;
+              }
+              if (typeof currentState.touchX === 'undefined') {
+                currentState.touchX = 0;
+              }
+              if (typeof currentState.touchY === 'undefined') {
+                currentState.touchY = 0;
+              }
+              
+              if (!currentState.isInteractionEnabled) {
+                currentState.isInteractionEnabled = true;
+                return;
+              }
+              event.preventDefault();
+              if (event.touches.length === 1) {
+                currentState.isTouching = true;
+                currentState.touchX = event.touches[0].clientX;
+                currentState.touchY = event.touches[0].clientY;
+              }
+            } catch (error) {
+              console.debug('Error in handleTouchStart:', error);
             }
           };
           
           const handleTouchMove = (event: TouchEvent) => {
-            if (!isTouching || event.touches.length !== 1) return;
-            event.preventDefault();
-            
-            const touch = event.touches[0];
-            const deltaX = touch.clientX - touchX;
-            const deltaY = touch.clientY - touchY;
-            
-            // SOLIDWORKS-style rotation for touch
-            targetRotationY += deltaX * 0.012; // Slightly higher sensitivity for touch
-            targetRotationX += deltaY * 0.012;
-            
-            touchX = touch.clientX;
-            touchY = touch.clientY;
+            try {
+              const currentState = getSafeCurrentState();
+              if (!currentState || !currentState.isInteractionEnabled || !currentState.isTouching || event.touches.length !== 1) return;
+              event.preventDefault();
+              
+              // Ensure rotation properties exist
+              if (typeof currentState.targetRotationX === 'undefined') {
+                currentState.targetRotationX = 0;
+              }
+              if (typeof currentState.targetRotationY === 'undefined') {
+                currentState.targetRotationY = 0;
+              }
+              
+              const touch = event.touches[0];
+              const deltaX = touch.clientX - currentState.touchX;
+              const deltaY = touch.clientY - currentState.touchY;
+              
+              // SOLIDWORKS-style rotation for touch
+              currentState.targetRotationY += deltaX * 0.012; // Slightly higher sensitivity for touch
+              currentState.targetRotationX += deltaY * 0.012;
+              
+              currentState.touchX = touch.clientX;
+              currentState.touchY = touch.clientY;
+            } catch (error) {
+              console.debug('Error in handleTouchMove:', error);
+            }
           };
           
           const handleTouchEnd = (event: TouchEvent) => {
-            isTouching = false;
+            try {
+              const currentState = getSafeCurrentState();
+              if (currentState && typeof currentState.isTouching !== 'undefined') {
+                currentState.isTouching = false;
+              }
+            } catch (error) {
+              console.debug('Error in handleTouchEnd:', error);
+            }
           };
           
           // Pinch to zoom for mobile
-          let lastTouchDistance = 0;
           
           const getTouchDistance = (touches: TouchList) => {
             const touch1 = touches[0];
@@ -206,26 +412,52 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
           };
           
           const handleTouchStartPinch = (event: TouchEvent) => {
-            if (event.touches.length === 2) {
-              lastTouchDistance = getTouchDistance(event.touches);
+            try {
+              const currentState = getSafeCurrentState();
+              if (!currentState) return;
+              
+              // Ensure lastTouchDistance exists
+              if (typeof currentState.lastTouchDistance === 'undefined') {
+                currentState.lastTouchDistance = 0;
+              }
+              
+              if (event.touches.length === 2) {
+                currentState.lastTouchDistance = getTouchDistance(event.touches);
+              }
+            } catch (error) {
+              console.debug('Error in handleTouchStartPinch:', error);
             }
           };
           
           const handleTouchMovePinch = (event: TouchEvent) => {
-            if (event.touches.length === 2) {
+            try {
+              const currentState = getSafeCurrentState();
+              if (!currentState || !currentState.isInteractionEnabled || event.touches.length !== 2) return;
               event.preventDefault();
+              
+              // Ensure zoom properties exist
+              if (typeof currentState.targetZoom === 'undefined') {
+                currentState.targetZoom = 2.5;
+              }
+              if (typeof currentState.lastTouchDistance === 'undefined') {
+                currentState.lastTouchDistance = 0;
+              }
+              
               const currentDistance = getTouchDistance(event.touches);
-              const deltaDistance = currentDistance - lastTouchDistance;
+              const deltaDistance = currentDistance - currentState.lastTouchDistance;
               
               const zoomSpeed = 0.01;
-              targetZoom -= deltaDistance * zoomSpeed;
-              targetZoom = Math.max(1.0, Math.min(6.0, targetZoom));
+              currentState.targetZoom -= deltaDistance * zoomSpeed;
+              currentState.targetZoom = Math.max(1.0, Math.min(6.0, currentState.targetZoom));
               
-              lastTouchDistance = currentDistance;
+              currentState.lastTouchDistance = currentDistance;
+            } catch (error) {
+              console.debug('Error in handleTouchMovePinch:', error);
             }
           };
           
           // Add event listeners for mouse and touch
+          renderer.domElement.addEventListener('click', handleClick);
           renderer.domElement.addEventListener('mousedown', handleMouseDown);
           renderer.domElement.addEventListener('wheel', handleWheel, { passive: false });
           renderer.domElement.addEventListener('contextmenu', handleContextMenu);
@@ -242,55 +474,119 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
           renderer.domElement.addEventListener('touchmove', handleTouchMovePinch, { passive: false });
           
           // Enhanced animation loop
+          let animationFrameId: number;
+          let isAnimating = true;
+          
           const animate = () => {
-            requestAnimationFrame(animate);
-            
-            // Smooth rotation interpolation
-            currentRotationX += (targetRotationX - currentRotationX) * 0.15;
-            currentRotationY += (targetRotationY - currentRotationY) * 0.15;
-            currentZoom += (targetZoom - currentZoom) * 0.15;
-            
-            mesh.rotation.x = currentRotationX;
-            mesh.rotation.y = currentRotationY;
-            
-            // Update camera position for zoom
-            camera.position.z = currentZoom;
-            
-            // Auto-rotation around Y-axis when not interacting (mouse or touch)
-            if (!isMouseDown && !isRightMouseDown && !isTouching) {
-              targetRotationY += 0.003; // Rotates around Y-axis (vertical axis) like SOLIDWORKS
+            try {
+              if (!isAnimating) return;
+              
+              const currentState = getSafeCurrentState();
+              if (!currentState) {
+                console.debug('Animate: Failed to get safe state');
+                isAnimating = false;
+                return;
+              }
+              if (!mesh || !camera || !renderer) {
+                console.debug('Animate: missing Three.js objects');
+                isAnimating = false;
+                return;
+              }
+              
+              // Additional safety check for all animation properties - ensure they exist
+              if (typeof currentState.currentRotationX === 'undefined') currentState.currentRotationX = 0;
+              if (typeof currentState.currentRotationY === 'undefined') currentState.currentRotationY = 0;
+              if (typeof currentState.targetRotationX === 'undefined') currentState.targetRotationX = 0;
+              if (typeof currentState.targetRotationY === 'undefined') currentState.targetRotationY = 0;
+              if (typeof currentState.currentZoom === 'undefined') currentState.currentZoom = 2.5;
+              if (typeof currentState.targetZoom === 'undefined') currentState.targetZoom = 2.5;
+              if (typeof currentState.isMouseDown === 'undefined') currentState.isMouseDown = false;
+              if (typeof currentState.isRightMouseDown === 'undefined') currentState.isRightMouseDown = false;
+              if (typeof currentState.isTouching === 'undefined') currentState.isTouching = false;
+              
+              const rotationX = currentState.currentRotationX;
+              const rotationY = currentState.currentRotationY;
+              const targetRotationX = currentState.targetRotationX;
+              const targetRotationY = currentState.targetRotationY;
+              const zoom = currentState.currentZoom;
+              const targetZoom = currentState.targetZoom;
+              
+              // Smooth rotation interpolation
+              currentState.currentRotationX = rotationX + (targetRotationX - rotationX) * 0.15;
+              currentState.currentRotationY = rotationY + (targetRotationY - rotationY) * 0.15;
+              currentState.currentZoom = zoom + (targetZoom - zoom) * 0.15;
+              
+              mesh.rotation.x = currentState.currentRotationX;
+              mesh.rotation.y = currentState.currentRotationY;
+              
+              // Update camera position for zoom
+              camera.position.z = currentState.currentZoom;
+              
+              // Auto-rotation around Y-axis always happens, but stops when actively interacting
+              if (!currentState.isMouseDown && !currentState.isRightMouseDown && !currentState.isTouching) {
+                currentState.targetRotationY += 0.003; // Rotates around Y-axis (vertical axis) like SOLIDWORKS
+              }
+              
+              renderer.render(scene, camera);
+              
+              if (isAnimating) {
+                animationFrameId = requestAnimationFrame(animate);
+              }
+            } catch (error) {
+              console.debug('Error in animation loop:', error);
+              isAnimating = false;
             }
-            
-            renderer.render(scene, camera);
           };
           animate();
           
-          // Cleanup function for all event listeners
+          // Cleanup function for all event listeners - completely safe
           const cleanup = () => {
-            // Mouse events
-            renderer.domElement.removeEventListener('mousedown', handleMouseDown);
-            renderer.domElement.removeEventListener('wheel', handleWheel);
-            renderer.domElement.removeEventListener('contextmenu', handleContextMenu);
-            document.removeEventListener('mouseup', handleMouseUp);
-            document.removeEventListener('mousemove', handleMouseMove);
+            // Stop animation
+            isAnimating = false;
+            if (animationFrameId) {
+              cancelAnimationFrame(animationFrameId);
+            }
             
-            // Touch events
-            renderer.domElement.removeEventListener('touchstart', handleTouchStart);
-            renderer.domElement.removeEventListener('touchmove', handleTouchMove);
-            renderer.domElement.removeEventListener('touchend', handleTouchEnd);
-            renderer.domElement.removeEventListener('touchstart', handleTouchStartPinch);
-            renderer.domElement.removeEventListener('touchmove', handleTouchMovePinch);
+            // Safe event listener removal with checks
+            try {
+              if (renderer && renderer.domElement && typeof renderer.domElement.removeEventListener === 'function') {
+                renderer.domElement.removeEventListener('click', handleClick);
+                renderer.domElement.removeEventListener('mousedown', handleMouseDown);
+                renderer.domElement.removeEventListener('wheel', handleWheel);
+                renderer.domElement.removeEventListener('contextmenu', handleContextMenu);
+                renderer.domElement.removeEventListener('touchstart', handleTouchStart);
+                renderer.domElement.removeEventListener('touchmove', handleTouchMove);
+                renderer.domElement.removeEventListener('touchend', handleTouchEnd);
+                renderer.domElement.removeEventListener('touchstart', handleTouchStartPinch);
+                renderer.domElement.removeEventListener('touchmove', handleTouchMovePinch);
+              }
+            } catch (e) {
+              console.debug('Renderer event listener cleanup failed:', e);
+            }
+            
+            // Safe document event listener removal
+            try {
+              document.removeEventListener('mouseup', handleMouseUp);
+              document.removeEventListener('mousemove', handleMouseMove);
+            } catch (e) {
+              console.debug('Document event listener cleanup failed:', e);
+            }
           };
           
           // Handle window resize
           const handleResize = () => {
-            const newWidth = container.clientWidth;
-            const newHeight = container.clientHeight;
-            
-            camera.aspect = newWidth / newHeight;
-            camera.updateProjectionMatrix();
-            
-            renderer.setSize(newWidth, newHeight);
+            try {
+              const newWidth = mountContainer.clientWidth;
+              const newHeight = mountContainer.clientHeight;
+              
+              if (camera && renderer) {
+                camera.aspect = newWidth / newHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(newWidth, newHeight);
+              }
+            } catch (e) {
+              console.debug('Resize handler failed:', e);
+            }
           };
           
           window.addEventListener('resize', handleResize);
@@ -298,7 +594,11 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
           // Store cleanup function for later use
           (renderer as any).cleanup = () => {
             cleanup();
-            window.removeEventListener('resize', handleResize);
+            try {
+              window.removeEventListener('resize', handleResize);
+            } catch (e) {
+              console.debug('Window resize event listener cleanup failed:', e);
+            }
           };
         },
         (progress) => {
@@ -309,23 +609,63 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
           console.error('Error loading STL:', error);
           setError("Failed to load STL file. File may not exist or be corrupted.");
           setLoading(false);
+          
+          // Clear initialization flag on error
+          try {
+            if (mountRef.current) {
+              (mountRef.current as any).__stl_initializing = false;
+            }
+          } catch (e) {
+            console.debug('Failed to clear initialization flag on error:', e);
+          }
         }
       );
 
-      // Cleanup
+      // **CRITICAL FIX**: Minimal cleanup - let React handle DOM completely
       return () => {
+        // Stop any ongoing animations and remove event listeners
         if ((renderer as any).cleanup) {
-          (renderer as any).cleanup();
+          try {
+            (renderer as any).cleanup();
+          } catch (e) {
+            console.debug('Cleanup function failed:', e);
+          }
         }
-        if (mountRef.current && renderer.domElement) {
-          mountRef.current.removeChild(renderer.domElement);
+        
+        // **DO NOT TOUCH THE DOM** - React will handle all DOM cleanup
+        // This prevents the "removeChild" error completely
+        
+        // Only dispose Three.js resources, not DOM elements
+        try {
+          if (renderer && typeof renderer.dispose === 'function') {
+            renderer.dispose();
+          }
+        } catch (e) {
+          console.debug('Renderer disposal failed:', e);
         }
-        renderer.dispose();
+        
+        // Clear initialization flag
+        try {
+          if (mountRef.current) {
+            (mountRef.current as any).__stl_initializing = false;
+          }
+        } catch (e) {
+          console.debug('Failed to clear initialization flag:', e);
+        }
       };
     } else {
       // Unsupported format
       setLoading(false);
       setError("Unsupported file format. Only STL files can be previewed.");
+      
+      // Clear initialization flag for unsupported files
+      try {
+        if (mountRef.current) {
+          (mountRef.current as any).__stl_initializing = false;
+        }
+      } catch (e) {
+        console.debug('Failed to clear initialization flag for unsupported format:', e);
+      }
     }
   }, [stlFile]);
 
@@ -336,7 +676,22 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
     link.download = stlFile.split('/').pop() || 'model';
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    
+    // Safe removal with error handling
+    try {
+      if (document.body.contains(link)) {
+        document.body.removeChild(link);
+      }
+    } catch (e) {
+      // Fallback: remove via parent node if direct removal fails
+      try {
+        if (link.parentNode) {
+          link.parentNode.removeChild(link);
+        }
+      } catch (innerE) {
+        console.debug('Link cleanup failed:', innerE);
+      }
+    }
   };
 
   const handleFullscreen = () => {

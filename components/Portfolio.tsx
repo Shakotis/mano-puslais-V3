@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
+import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { Divider } from "@heroui/divider";
@@ -48,7 +48,7 @@ const Portfolio: React.FC = () => {
           <div className="w-24 h-1 bg-indigo-500 mx-auto"></div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 items-start">
           {projects.map((project, index) => (
             <motion.div
               key={project.title}
@@ -58,7 +58,7 @@ const Portfolio: React.FC = () => {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
               whileHover={{ y: -5 }}
-              className="h-full flex"
+              className="h-full flex min-h-[800px]"
             >
               <Card 
                 className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-indigo-500 transition-all duration-300 w-full flex flex-col rounded-xl"
@@ -72,34 +72,39 @@ const Portfolio: React.FC = () => {
                   </div>
                 </CardHeader>
                 
-                <CardBody className="p-4 flex-1">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-2xl font-bold text-white">
-                      {project.title}
-                    </h3>
-                    <Chip 
-                      size="sm" 
-                      variant="flat" 
-                      color={
-                        project.status === "Completed" ? "success" :
-                        project.status === "Currently Working" ? "primary" :
-                        "warning"
-                      } 
-                      className={
-                        project.status === "Completed" ? "text-green-300 bg-green-900/50" :
-                        project.status === "Currently Working" ? "text-blue-300 bg-blue-900/50" :
-                        "text-yellow-300 bg-yellow-900/50"
-                      }
-                    >
-                      {project.status}
-                    </Chip>
+                <CardBody className="p-4 flex-1 flex flex-col h-full">
+                  {/* Top content - fixed height for alignment */}
+                  <div className="flex-grow-0">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-2xl font-bold text-white">
+                        {project.title}
+                      </h3>
+                      <Chip 
+                        size="sm" 
+                        variant="flat" 
+                        color={
+                          project.status === "Completed" ? "success" :
+                          project.status === "Currently Working" ? "primary" :
+                          "warning"
+                        } 
+                        className={
+                          project.status === "Completed" ? "text-green-300 bg-green-900/50" :
+                          project.status === "Currently Working" ? "text-blue-300 bg-blue-900/50" :
+                          "text-yellow-300 bg-yellow-900/50"
+                        }
+                      >
+                        {project.status}
+                      </Chip>
+                    </div>
+                    <div className="min-h-24 mb-4">
+                      <p className="text-gray-400 text-base leading-relaxed line-clamp-4">
+                        {project.description}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-gray-400 text-base leading-relaxed mb-4">
-                    {project.description}
-                  </p>
                   
-                  {/* Progress Bar */}
-                  <div className="mb-4">
+                  {/* Progress Bar - aligned position */}
+                  <div className="mb-4 h-16 flex-grow-0">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm font-medium text-gray-300">Project Progress</span>
                       <span className="text-sm text-gray-400">{project.progress}%</span>
@@ -117,7 +122,8 @@ const Portfolio: React.FC = () => {
                     />
                   </div>
                   
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  {/* Technologies - flexible height */}
+                  <div className="flex flex-wrap gap-2 mb-4 flex-grow-0 min-h-12">
                     {project.technologies.map((tech) => (
                       <Chip
                         key={tech.name}
@@ -135,7 +141,9 @@ const Portfolio: React.FC = () => {
                     ))}
                   </div>
 
-                  <Accordion variant="splitted" className="px-0">
+                  {/* Accordion - flexible area that can expand */}
+                  <div className="flex-grow">
+                    <Accordion variant="splitted" className="px-0">
                     <AccordionItem
                       key="overview"
                       aria-label="Project Overview"
@@ -176,34 +184,64 @@ const Portfolio: React.FC = () => {
                         ))}
                       </div>
                     </AccordionItem>
-                  </Accordion>
+                    <AccordionItem
+                      key="downloads"
+                      aria-label="Downloads & Links"
+                      title={<span className="text-gray-300 font-medium">Downloads & Links</span>}
+                      className="bg-gray-800/30 border-none"
+                    >
+                      <div className="space-y-3 pb-2">
+                        {project.id === "camera-head-robot" ? (
+                          // Camera Head Robot: No files available yet
+                          <div className="text-center py-4">
+                            <p className="text-gray-500 text-sm">Empty yet</p>
+                          </div>
+                        ) : project.id === "tracked-robot-chassis" ? (
+                          // Tracked Robot Chassis: Only project page
+                          <Button
+                            as="a"
+                            href={project.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                            radius="md"
+                            startContent={<FaExternalLinkAlt className="w-4 h-4" />}
+                          >
+                            View Project Page
+                          </Button>
+                        ) : (
+                          // Other projects: Default options
+                          <div className="space-y-2">
+                            <Button
+                              as="a"
+                              href={project.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                              radius="md"
+                              startContent={<FaExternalLinkAlt className="w-4 h-4" />}
+                            >
+                              View Project
+                            </Button>
+                            <Button
+                              as="a"
+                              href={project.downloadLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="bordered"
+                              className="w-full border-indigo-600 text-indigo-400 hover:bg-indigo-600 hover:text-white"
+                              radius="md"
+                              startContent={<FaDownload className="w-4 h-4" />}
+                            >
+                              Download Files
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </AccordionItem>
+                    </Accordion>
+                  </div>
                 </CardBody>
-                
-                <CardFooter className="p-4 flex gap-2">
-                  <Button
-                    as="a"
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
-                    radius="lg"
-                    startContent={<FaExternalLinkAlt className="w-4 h-4" />}
-                  >
-                    View Project
-                  </Button>
-                  <Button
-                    as="a"
-                    href={project.downloadLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="bordered"
-                    className="border-indigo-600 text-indigo-400 hover:bg-indigo-600 hover:text-white"
-                    radius="lg"
-                    isIconOnly
-                  >
-                    <FaDownload className="w-4 h-4" />
-                  </Button>
-                </CardFooter>
               </Card>
             </motion.div>
           ))}
@@ -214,9 +252,9 @@ const Portfolio: React.FC = () => {
             transition={{ duration: 0.6, delay: projects.length * 0.1 }}
             viewport={{ once: true }}
             whileHover={{ y: -5 }}
-            className="h-full flex"
+            className="flex"
           >
-            <Card className="bg-gray-900/30 border-2 border-dashed border-gray-700 hover:border-indigo-500 transition-all duration-300 w-full flex flex-col items-center justify-center rounded-xl" isPressable radius="lg">
+            <Card className="bg-gray-900/30 border-2 border-dashed border-gray-700 hover:border-indigo-500 transition-all duration-300 w-full h-[800px] flex flex-col items-center justify-center rounded-xl" isPressable radius="lg">
               <div className="text-center p-8">
                 <div className="text-gray-500 mb-4">
                   <FaCube className="w-16 h-16 mx-auto" />

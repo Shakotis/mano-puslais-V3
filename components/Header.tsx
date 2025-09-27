@@ -121,6 +121,7 @@ const Header: React.FC = () => {
               variant="light"
               onClick={() => setIsDrawerOpen(true)}
               className="text-gray-100 hover:text-indigo-400 transition-colors"
+              style={{ display: isDrawerOpen ? 'none' : 'flex' }}
             >
               <FaBars className="w-6 h-6" />
             </Button>
