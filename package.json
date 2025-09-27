@@ -11,6 +11,7 @@
     "netlify-build": "next build"
   },
   "dependencies": {
+    "@eslint/eslintrc": "^3.3.1",
     "@heroui/accordion": "2.2.23",
     "@heroui/alert": "2.2.26",
     "@heroui/autocomplete": "2.3.28",
@@ -67,6 +68,8 @@
     "three": "^0.180.0"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.4.0",
+    "@eslint/js": "^9.36.0",
     "@next/eslint-plugin-next": "15.3.4",
     "@react-types/shared": "3.30.0",
     "@tailwindcss/postcss": "4.1.11",
