@@ -13,6 +13,7 @@ import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
+import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
@@ -27,6 +28,8 @@ import {
 } from "@/components/icons";
 
 export const Navbar = () => {
+  const pathname = usePathname();
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -50,29 +53,36 @@ export const Navbar = () => {
 
   return (
     <HeroUINavbar maxWidth="xl" position="sticky">
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="end">
-        <ul className="hidden lg:flex gap-4 justify-end mr-2">
-          {siteConfig.navItems.map((item) => (
+      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
+        <NavbarBrand as="li" className="gap-3 max-w-fit">
+          <NextLink className="flex justify-start items-center gap-1" href="/">
+            <Logo />
+            <p className="font-bold text-inherit">Dovydas Juševičius</p>
+          </NextLink>
+        </NavbarBrand>
+      </NavbarContent>
+
+      <NavbarContent className="hidden lg:flex gap-4" justify="center">
+        {siteConfig.navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
             <NavbarItem key={item.href}>
               <NextLink
                 className={clsx(
                   linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                  "relative transition-colors duration-200",
+                  isActive 
+                    ? "text-primary font-medium after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full data-[focus-visible=true]:after:hidden" 
+                    : "hover:text-primary/80"
                 )}
-                color="foreground"
                 href={item.href}
+                scroll={false}
               >
                 {item.label}
               </NextLink>
             </NavbarItem>
-          ))}
-        </ul>
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-end items-center gap-1" href="/">
-            <Logo />
-            <p className="font-bold text-inherit">ACME</p>
-          </NextLink>
-        </NavbarBrand>
+          );
+        })}
       </NavbarContent>
 
       <NavbarContent
@@ -90,19 +100,6 @@ export const Navbar = () => {
             <GithubIcon className="text-default-500" />
           </Link>
           <ThemeSwitch />
-        </NavbarItem>
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >
-            Sponsor
-          </Button>
         </NavbarItem>
       </NavbarContent>
 

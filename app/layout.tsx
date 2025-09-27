@@ -9,7 +9,7 @@ import { fontSans } from "@/config/fonts";
 
 export const metadata: Metadata = {
   title: {
-    default: "Dovydas Jusevičius - Engineering Portfolio",
+    default: "Dovydas Jusevičius",
     template: `%s - Dovydas Jusevičius`,
   },
   description: "Portfolio of Dovydas Jusevičius - High school student passionate about engineering design, CAD, robotics, and innovation.",

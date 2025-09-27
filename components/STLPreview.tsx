@@ -183,10 +183,10 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
       loader.load(
         stlFile,
         (geometry) => {
-          const material = new THREE.MeshBasicMaterial({ 
-            color: 0x00ff88, // Bright green wireframe like CAD software
-            wireframe: true,
-            wireframeLinewidth: 1
+          const material = new THREE.MeshStandardMaterial({ 
+            color: 0x888888, // Neutral gray
+            metalness: 0.2,  // Low metalness for a matte, solid look
+            roughness: 0.6   // High roughness for a non-shiny surface
           });
           const mesh = new THREE.Mesh(geometry, material);
           
