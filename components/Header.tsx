@@ -14,6 +14,9 @@ const Header: React.FC = () => {
   const [activeSection, setActiveSection] = useState("#hero");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   const navItems = [
     { name: "Home", href: "#hero" },
@@ -26,24 +29,45 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+      
+      setIsScrolled(currentScrollY > 20);
+      
+      // Show/hide navbar based on scroll direction
+      if (currentScrollY < lastScrollY || currentScrollY < 100) {
+        // Scrolling up or near top
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down and past threshold
+        setIsVisible(false);
+        // Close drawer if open while scrolling down
+        setIsDrawerOpen(false);
+      }
+      
+      setLastScrollY(currentScrollY);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   useEffect(() => {
     const sections = navItems.map(item => document.querySelector(item.href));
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(`#${entry.target.id}`);
-          }
-        });
+        // Only update active section if we're not currently scrolling from a click
+        if (!isScrolling) {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection(`#${entry.target.id}`);
+            }
+          });
+        }
       },
-      { rootMargin: "-50% 0px -50% 0px", threshold: 0 }
+      { 
+        rootMargin: "-20% 0px -70% 0px", 
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5] 
+      }
     );
 
     sections.forEach((section) => {
@@ -55,12 +79,26 @@ const Header: React.FC = () => {
         if (section) observer.unobserve(section);
       });
     };
-  }, []);
+  }, [isScrolling]);
 
   const handleNavClick = (href: string) => {
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    setIsScrolling(true);
     setActiveSection(href);
     setIsDrawerOpen(false);
+    
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: "smooth",
+        block: "start",
+        inline: "nearest"
+      });
+      
+      // Reset scrolling state after animation completes
+      setTimeout(() => {
+        setIsScrolling(false);
+      }, 1000);
+    }
   };
 
   const toggleDrawer = () => {
@@ -72,8 +110,11 @@ const Header: React.FC = () => {
     <>
       <motion.div
         initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        animate={{ 
+          y: isVisible ? 0 : -100, 
+          opacity: isVisible ? 1 : 0 
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
         className="fixed top-0 left-0 right-0 z-50"
       >
         <nav 
@@ -83,7 +124,7 @@ const Header: React.FC = () => {
               : "bg-black/20 backdrop-blur-md border-b border-white/5"
           }`}
         >
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-full">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-1 flex items-center justify-between h-full">
             {/* Brand */}
             <div className="flex-shrink-0">
               <motion.div
