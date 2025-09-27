@@ -192,7 +192,7 @@ const Portfolio: React.FC = () => {
                     >
                       <div className="space-y-3 pb-2">
                         {project.id === "camera-head-robot" ? (
-                          // Camera Head Robot: No files available yet
+                          // project AVATARAS: No files available yet
                           <div className="text-center py-4">
                             <p className="text-gray-500 text-sm">Empty yet</p>
                           </div>

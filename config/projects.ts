@@ -27,7 +27,7 @@ export interface ProjectConfig {
 export const projectsConfig: ProjectConfig[] = [
   {
     id: "camera-head-robot",
-    title: "Camera Head Robot",
+    title: "project AVATARAS",
     description: "A humanoid robot with a camera for a head. This project is currently on hold, pending further development.",
     link: "#",
     githubLink: "#",
@@ -40,7 +40,7 @@ export const projectsConfig: ProjectConfig[] = [
       { name: "Electronics", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
     ],
     features: ["Humanoid Design", "Camera Head", "Bipedal"],
-    stlFile: "/Remas.stl",
+    stlFile: "/avataras-Assembly.stl",
     detailedInfo: {
       overview: "This project involves the design and construction of a humanoid robot. The defining feature is a camera integrated into the head, providing a first-person view for remote operation or autonomous navigation. The project is currently paused.",
       challenges: [

@@ -40,12 +40,19 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
     mouseY: 0,
     touchX: 0,
     touchY: 0,
-    targetRotationX: 0,
-    targetRotationY: 0,
-    currentRotationX: 0,
-    currentRotationY: 0,
-    targetZoom: 2.5,
-    currentZoom: 2.5,
+    // Object coordinate system (for initial STL orientation - to make models stand upright)
+    objectRotationX: -Math.PI / 2, // Pitch: -90° to stand up models lying on sides
+    objectRotationY: 0,             // Yaw: initial left/right orientation
+    objectRotationZ: 0,             // Roll: initial twist orientation
+    // View coordinate system (for user interaction controls)
+    targetViewRotationX: 0,         // User pitch control
+    targetViewRotationY: 0,         // User yaw control  
+    targetViewRotationZ: 0,         // User roll control
+    currentViewRotationX: 0,        // Current pitch state
+    currentViewRotationY: 0,        // Current yaw state
+    currentViewRotationZ: 0,        // Current roll state
+    targetZoom: 3.2,                // Updated to match new camera distance - zoomed in a bit
+    currentZoom: 3.2,               // Updated to match new camera distance - zoomed in a bit
     lastTouchDistance: 0
   });
   
@@ -77,11 +84,16 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
       // If state is null or missing critical properties, reinitialize
       if (!state || 
           typeof state.isInteractionEnabled === 'undefined' ||
-          typeof state.currentRotationX === 'undefined' ||
+          typeof state.objectRotationX === 'undefined' ||
+          typeof state.objectRotationY === 'undefined' ||
+          typeof state.objectRotationZ === 'undefined' ||
+          typeof state.currentViewRotationX === 'undefined' ||
+          typeof state.currentViewRotationY === 'undefined' ||
+          typeof state.currentViewRotationZ === 'undefined' ||
           typeof state.isMouseDown === 'undefined' ||
-          typeof state.targetRotationX === 'undefined' ||
-          typeof state.targetRotationY === 'undefined' ||
-          typeof state.currentRotationY === 'undefined' ||
+          typeof state.targetViewRotationX === 'undefined' ||
+          typeof state.targetViewRotationY === 'undefined' ||
+          typeof state.targetViewRotationZ === 'undefined' ||
           typeof state.targetZoom === 'undefined' ||
           typeof state.currentZoom === 'undefined' ||
           typeof state.isRightMouseDown === 'undefined' ||
@@ -191,7 +203,15 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
           mesh.scale.setScalar(scale);
           
           scene.add(mesh);
-          camera.position.z = 2.5; // Moved camera closer for bigger appearance
+          
+          // Set isometric camera position (classic 3D CAD view) - zoomed in a bit
+          const distance = 3.2; // Zoomed in from 2.0 for better model visibility
+          camera.position.set(
+            distance * Math.cos(Math.PI / 4) * Math.cos(Math.PI / 6),  // X: 45° around Y, 30° elevation
+            distance * Math.sin(Math.PI / 6),                          // Y: 30° elevation
+            distance * Math.sin(Math.PI / 4) * Math.cos(Math.PI / 6)   // Z: 45° around Y, 30° elevation
+          );
+          camera.lookAt(0, 0, 0); // Look at the center of the model
           
           setLoading(false);
           
@@ -289,8 +309,8 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
               
               if (currentState.isMouseDown) {
                 // SOLIDWORKS-style rotation: horizontal mouse = Y-axis rotation, vertical mouse = X-axis rotation
-                currentState.targetRotationY = (currentState.targetRotationY || 0) + deltaX * 0.008;
-                currentState.targetRotationX = (currentState.targetRotationX || 0) + deltaY * 0.008;
+                currentState.targetViewRotationY = (currentState.targetViewRotationY || 0) + deltaX * 0.008;
+                currentState.targetViewRotationX = (currentState.targetViewRotationX || 0) + deltaY * 0.008;
               }
               
               currentState.mouseX = event.clientX || 0;
@@ -368,11 +388,11 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
               event.preventDefault();
               
               // Ensure rotation properties exist
-              if (typeof currentState.targetRotationX === 'undefined') {
-                currentState.targetRotationX = 0;
+              if (typeof currentState.targetViewRotationX === 'undefined') {
+                currentState.targetViewRotationX = 0;
               }
-              if (typeof currentState.targetRotationY === 'undefined') {
-                currentState.targetRotationY = 0;
+              if (typeof currentState.targetViewRotationY === 'undefined') {
+                currentState.targetViewRotationY = 0;
               }
               
               const touch = event.touches[0];
@@ -380,8 +400,8 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
               const deltaY = touch.clientY - currentState.touchY;
               
               // SOLIDWORKS-style rotation for touch
-              currentState.targetRotationY += deltaX * 0.012; // Slightly higher sensitivity for touch
-              currentState.targetRotationX += deltaY * 0.012;
+              currentState.targetViewRotationY += deltaX * 0.012; // Slightly higher sensitivity for touch
+              currentState.targetViewRotationX += deltaY * 0.012;
               
               currentState.touchX = touch.clientX;
               currentState.touchY = touch.clientY;
@@ -494,37 +514,58 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
               }
               
               // Additional safety check for all animation properties - ensure they exist
-              if (typeof currentState.currentRotationX === 'undefined') currentState.currentRotationX = 0;
-              if (typeof currentState.currentRotationY === 'undefined') currentState.currentRotationY = 0;
-              if (typeof currentState.targetRotationX === 'undefined') currentState.targetRotationX = 0;
-              if (typeof currentState.targetRotationY === 'undefined') currentState.targetRotationY = 0;
-              if (typeof currentState.currentZoom === 'undefined') currentState.currentZoom = 2.5;
-              if (typeof currentState.targetZoom === 'undefined') currentState.targetZoom = 2.5;
+              if (typeof currentState.currentViewRotationX === 'undefined') currentState.currentViewRotationX = 0;
+              if (typeof currentState.currentViewRotationY === 'undefined') currentState.currentViewRotationY = 0;
+              if (typeof currentState.currentViewRotationZ === 'undefined') currentState.currentViewRotationZ = 0;
+              if (typeof currentState.targetViewRotationX === 'undefined') currentState.targetViewRotationX = 0;
+              if (typeof currentState.targetViewRotationY === 'undefined') currentState.targetViewRotationY = 0;
+              if (typeof currentState.targetViewRotationZ === 'undefined') currentState.targetViewRotationZ = 0;
+              if (typeof currentState.currentZoom === 'undefined') currentState.currentZoom = 3.2;
+              if (typeof currentState.targetZoom === 'undefined') currentState.targetZoom = 3.2;
               if (typeof currentState.isMouseDown === 'undefined') currentState.isMouseDown = false;
               if (typeof currentState.isRightMouseDown === 'undefined') currentState.isRightMouseDown = false;
               if (typeof currentState.isTouching === 'undefined') currentState.isTouching = false;
               
-              const rotationX = currentState.currentRotationX;
-              const rotationY = currentState.currentRotationY;
-              const targetRotationX = currentState.targetRotationX;
-              const targetRotationY = currentState.targetRotationY;
+              const viewRotationX = currentState.currentViewRotationX;
+              const viewRotationY = currentState.currentViewRotationY;
+              const viewRotationZ = currentState.currentViewRotationZ;
+              const targetViewRotationX = currentState.targetViewRotationX;
+              const targetViewRotationY = currentState.targetViewRotationY;
+              const targetViewRotationZ = currentState.targetViewRotationZ;
               const zoom = currentState.currentZoom;
               const targetZoom = currentState.targetZoom;
               
-              // Smooth rotation interpolation
-              currentState.currentRotationX = rotationX + (targetRotationX - rotationX) * 0.15;
-              currentState.currentRotationY = rotationY + (targetRotationY - rotationY) * 0.15;
+              // Smooth rotation interpolation for view controls
+              currentState.currentViewRotationX = viewRotationX + (targetViewRotationX - viewRotationX) * 0.15;
+              currentState.currentViewRotationY = viewRotationY + (targetViewRotationY - viewRotationY) * 0.15;
+              currentState.currentViewRotationZ = viewRotationZ + (targetViewRotationZ - viewRotationZ) * 0.15;
               currentState.currentZoom = zoom + (targetZoom - zoom) * 0.15;
               
-              mesh.rotation.x = currentState.currentRotationX;
-              mesh.rotation.y = currentState.currentRotationY;
+              // Apply rotations in proper order to prevent rolling
+              // Set rotation order to ensure yaw happens around world Y-axis
+              mesh.rotation.order = 'YXZ'; // Y first (yaw), then X (pitch), then Z (roll)
               
-              // Update camera position for zoom
-              camera.position.z = currentState.currentZoom;
+              // Apply object orientation first (to stand up model)
+              mesh.rotation.x = currentState.objectRotationX; // Stand up the model
+              mesh.rotation.y = currentState.objectRotationY; // Initial yaw
+              mesh.rotation.z = currentState.objectRotationZ; // Initial roll
               
-              // Auto-rotation around Y-axis always happens, but stops when actively interacting
+              // Then apply view rotations (user interaction) 
+              mesh.rotation.y += currentState.currentViewRotationY; // Add yaw on top
+              mesh.rotation.x += currentState.currentViewRotationX; // Add pitch on top  
+              mesh.rotation.z += currentState.currentViewRotationZ; // Add roll on top
+              
+              // Update camera position for zoom while maintaining isometric angle
+              const zoomDistance = currentState.currentZoom;
+              camera.position.set(
+                zoomDistance * Math.cos(Math.PI / 4) * Math.cos(Math.PI / 6),  // X: maintain isometric angle
+                zoomDistance * Math.sin(Math.PI / 6),                          // Y: maintain elevation
+                zoomDistance * Math.sin(Math.PI / 4) * Math.cos(Math.PI / 6)   // Z: maintain isometric angle
+              );
+              
+              // Auto-rotation around Y-axis (yaw) - slow continuous rotation to showcase the model
               if (!currentState.isMouseDown && !currentState.isRightMouseDown && !currentState.isTouching) {
-                currentState.targetRotationY += 0.003; // Rotates around Y-axis (vertical axis) like SOLIDWORKS
+                currentState.targetViewRotationY += 0.005; // Slower rotation for better viewing
               }
               
               renderer.render(scene, camera);
