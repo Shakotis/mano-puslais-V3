@@ -4,11 +4,14 @@ import React from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
-import { Divider } from "@heroui/divider";
+
 import { Accordion, AccordionItem } from "@heroui/accordion";
 import { Progress } from "@heroui/progress";
 import { motion } from "framer-motion";
-import { FaExternalLinkAlt, FaCube, FaPrint, FaGithub, FaDownload } from "react-icons/fa";
+import {
+  FaExternalLinkAlt,
+  FaCube,
+} from "react-icons/fa";
 import STLPreview from "./STLPreview";
 import { projectsConfig, getProgressColor, getProgressGradient } from "../config/projects";
 
@@ -236,7 +239,7 @@ const Portfolio: React.FC = () => {
                   More Projects Coming Soon
                 </h3>
                 <p className="text-gray-500 text-base leading-relaxed">
-                  I'm always working on something new.
+                  I&apos;m always working on something new.
                 </p>
               </div>
             </Card>

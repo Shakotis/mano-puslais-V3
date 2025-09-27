@@ -2,12 +2,11 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  FaGithub, 
-  FaLinkedin, 
-  FaInstagram, 
+import {
+  FaGithub,
+  FaLinkedin,
+  FaInstagram,
   FaEnvelope,
-  FaHeart 
 } from "react-icons/fa";
 
 const Footer: React.FC = () => {

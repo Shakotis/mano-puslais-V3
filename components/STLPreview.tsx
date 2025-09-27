@@ -2,10 +2,7 @@
 
 // STLPreview Component - Version 3.0 (Complete removeChild error elimination)
 import React, { useRef, useEffect, useState } from "react";
-import { Card, CardBody } from "@heroui/card";
-import { Button } from "@heroui/button";
-import { motion } from "framer-motion";
-import { FaCube, FaDownload, FaExpand, FaExclamationTriangle } from "react-icons/fa";
+import { FaExclamationTriangle } from "react-icons/fa";
 import * as THREE from "three";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 

@@ -18,7 +18,7 @@ const Hero: React.FC = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight tracking-wide shadow-lg">
-            Dovydukas's Portfolio
+            Dovydukas&apos;s Portfolio
           </h1>
         </motion.div>
 

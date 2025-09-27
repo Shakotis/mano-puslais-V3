@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Card, CardBody } from "@heroui/card";
 import { motion } from "framer-motion";
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 
@@ -42,7 +42,9 @@ const Contact: React.FC = () => {
           </h2>
           <div className="w-24 h-1 bg-indigo-500 mx-auto"></div>
           <p className="text-lg text-gray-300 max-w-3xl mx-auto mt-6">
-            I'm always open to discussing new opportunities, collaborating on exciting projects, or connecting with fellow innovators. Feel free to reach out.
+            I&apos;m always open to discussing new opportunities, collaborating on
+            exciting projects, or connecting with fellow innovators. Feel free
+            to reach out.
           </p>
         </motion.div>
 

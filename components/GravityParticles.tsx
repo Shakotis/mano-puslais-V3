@@ -1,11 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-
-interface Vector {
-  x: number;
-  y: number;
-}
+import { useEffect, useRef } from "react";
 
 class VectorClass {
   x: number;
