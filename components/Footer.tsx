@@ -14,19 +14,19 @@ const Footer: React.FC = () => {
   const socialLinks = [
     {
       icon: <FaGithub className="w-6 h-6" />,
-      href: "https://github.com/dovydas",
+      href: "https://github.com/Shakotis",
       label: "GitHub",
       color: "hover:text-white"
     },
     {
       icon: <FaLinkedin className="w-6 h-6" />,
-      href: "https://linkedin.com/in/dovydas-jusevicius",
+      href: "https://www.linkedin.com/in/dovydas-jusevičius-8a4575337",
       label: "LinkedIn",
       color: "hover:text-blue-400"
     },
     {
       icon: <FaInstagram className="w-6 h-6" />,
-      href: "https://instagram.com/dovydas",
+      href: "https://www.instagram.com/dovydas_jusevicius/",
       label: "Instagram",
       color: "hover:text-pink-400"
     }

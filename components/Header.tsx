@@ -66,7 +66,7 @@ const Header: React.FC = () => {
       <Navbar 
         className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-gray-800/50"
         maxWidth="full"
-        height="72px"
+        height="120px"
       >
         <NavbarContent>
           <NavbarBrand>
@@ -75,12 +75,12 @@ const Header: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <p className="font-bold text-xl text-white">Dovydas Jusevičius</p>
+              <p className="font-bold text-2xl text-white">Dovydas Jusevičius</p>
             </motion.div>
           </NavbarBrand>
         </NavbarContent>
 
-        <NavbarContent className="hidden xl:flex gap-4" justify="center">
+        <NavbarContent className="hidden xl:flex gap-8" justify="center">
           {navItems.map((item, index) => (
             <NavbarItem key={item.name} isActive={activeSection === item.href}>
               <motion.div
@@ -91,7 +91,7 @@ const Header: React.FC = () => {
               >
                 <Link
                   href={item.href}
-                  className={`px-3 py-2 text-base transition-colors duration-300 rounded-md ${
+                  className={`px-6 py-3 text-lg transition-colors duration-300 rounded-md ${
                     activeSection === item.href
                       ? "text-white font-semibold"
                       : "text-gray-400 hover:text-white"

@@ -15,6 +15,23 @@ import { projectsConfig, getProgressColor, getProgressGradient } from "../config
 const Portfolio: React.FC = () => {
   const projects = projectsConfig;
 
+  const scrollToProject = (projectId: string) => {
+    // Add a small delay to ensure DOM is ready
+    setTimeout(() => {
+      const element = document.getElementById(projectId);
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+        
+        // Optional: Add focus for accessibility
+        element.focus({ preventScroll: true });
+      }
+    }, 100);
+  };
+
   return (
     <section id="portfolio" className="py-24 px-4 relative z-10">
       <div className="max-w-7xl mx-auto">
@@ -35,6 +52,7 @@ const Portfolio: React.FC = () => {
           {projects.map((project, index) => (
             <motion.div
               key={project.title}
+              id={project.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -49,7 +67,7 @@ const Portfolio: React.FC = () => {
                 shadow="lg"
               >
                 <CardHeader className="p-4">
-                  <div className="w-full h-56 bg-gray-800/50 border border-gray-700 rounded-lg relative overflow-hidden">
+                  <div className="w-full h-80 bg-gray-800/50 border border-gray-700 rounded-lg relative overflow-hidden">
                     <STLPreview stlFile={project.stlFile} />
                   </div>
                 </CardHeader>

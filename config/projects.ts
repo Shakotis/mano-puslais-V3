@@ -15,7 +15,7 @@ export interface ProjectConfig {
     icon: React.ReactNode;
   }>;
   features: string[];
-  stlFile: string;
+  stlFile: string; // Supports both .stl and .3mf files
   detailedInfo: {
     overview: string;
     challenges: string[];
@@ -25,42 +25,6 @@ export interface ProjectConfig {
 }
 
 export const projectsConfig: ProjectConfig[] = [
-  {
-    id: "camera-control-platform",
-    title: "Camera Control Platform",
-    description: "A camera control platform where a person can wear VR glasses and control the camera's movement by turning their head. This platform will be attached to a robot.",
-    link: "#",
-    githubLink: "#",
-    downloadLink: "#",
-    status: "Currently Working",
-    progress: 40, // Modify this value to change progress
-    technologies: [
-      { name: "VR Integration", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
-      { name: "Robotics", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
-      { name: "Electronics", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
-    ],
-    features: ["VR Control", "Head Tracking", "Robot Integration"],
-    stlFile: "/placeholder.stl",
-    detailedInfo: {
-      overview: "This project focuses on creating an intuitive camera control system using VR technology. The goal is to provide a seamless and immersive experience for controlling a robot-mounted camera.",
-      challenges: [
-        "Achieving low-latency head tracking.",
-        "Ensuring smooth and stable camera movement.",
-        "Developing a robust communication link between the VR headset and the robot."
-      ],
-      lessons: [
-        "Real-time data processing for robotics applications.",
-        "Interfacing with VR hardware and SDKs.",
-        "Mechanical design for camera stabilization."
-      ],
-      specifications: {
-        "VR Headset": "TBD",
-        "Robot Platform": "TBD",
-        "Communication": "Wireless",
-        "Status": "Currently Working"
-      }
-    }
-  },
   {
     id: "camera-head-robot",
     title: "Camera Head Robot",
@@ -76,7 +40,7 @@ export const projectsConfig: ProjectConfig[] = [
       { name: "Electronics", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
     ],
     features: ["Humanoid Design", "Camera Head", "Bipedal"],
-    stlFile: "/placeholder.stl",
+    stlFile: "/Remas.stl",
     detailedInfo: {
       overview: "This project involves the design and construction of a humanoid robot. The defining feature is a camera integrated into the head, providing a first-person view for remote operation or autonomous navigation. The project is currently paused.",
       challenges: [
@@ -112,7 +76,7 @@ export const projectsConfig: ProjectConfig[] = [
       { name: "Mechanical Engineering", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
     ],
     features: ["Tracked Drive", "Modular Design", "Open Source"],
-    stlFile: "/Chassis_V2.stl",
+    stlFile: "/Remas.stl",
     detailedInfo: {
       overview: "This tracked robot chassis is a comprehensive mechanical engineering project, from initial concept to final fabrication. It demonstrates proficiency in CAD, 3D printing, and mechanical assembly.",
       challenges: [

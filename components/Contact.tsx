@@ -55,7 +55,7 @@ const Contact: React.FC = () => {
           >
             <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl shadow-lg" isPressable radius="lg">
               <CardBody className="p-10">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
                   {contactInfo.map((info, index) => (
                     <motion.div
                       key={info.title}
@@ -63,7 +63,7 @@ const Contact: React.FC = () => {
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: 0.1 * index }}
                       viewport={{ once: true }}
-                      className="flex flex-col items-center text-center"
+                      className="flex flex-col items-center text-center w-full max-w-xs"
                     >
                       <div className="text-indigo-400 mb-4">
                         {info.icon}

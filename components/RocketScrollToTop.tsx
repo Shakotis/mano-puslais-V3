@@ -8,13 +8,16 @@ import { FaRocket } from "react-icons/fa";
 const RocketScrollToTop: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
-  // Show button when page is scrolled up to given distance
+  // Show button when user is near the bottom of the page
   const toggleVisibility = () => {
-    if (window.pageYOffset > 300) {
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
+    const scrollTop = window.pageYOffset;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    
+    // Show when user is within 500px of the bottom
+    const nearBottom = scrollTop + windowHeight >= documentHeight - 500;
+    
+    setIsVisible(nearBottom);
   };
 
   // Set the scroll event listener
@@ -68,12 +71,11 @@ const RocketScrollToTop: React.FC = () => {
         >
           <Button
             onClick={scrollToTop}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl w-16 h-16 md:w-20 md:h-20"
             radius="full"
-            size="lg"
             isIconOnly
           >
-            <FaRocket className="w-5 h-5" />
+            <FaRocket className="w-7 h-7 md:w-9 md:h-9" />
           </Button>
         </motion.div>
       )}
