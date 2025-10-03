@@ -18,7 +18,7 @@ const Hero: React.FC = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight tracking-wide shadow-lg">
-            Dovydukas&apos;s Portfolio
+            Dovydas&apos;s Portfolio
           </h1>
         </motion.div>
 
@@ -28,7 +28,7 @@ const Hero: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
         >
           <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            A showcase of my journey in engineering and design, where I turn complex challenges into elegant solutions.
+            A showcase of my journey in engineering and design.
           </p>
         </motion.div>
 
