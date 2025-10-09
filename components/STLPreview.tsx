@@ -2,7 +2,10 @@
 
 // STLPreview Component - Version 3.0 (Complete removeChild error elimination)
 import React, { useRef, useEffect, useState } from "react";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { Card, CardBody } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { motion } from "framer-motion";
+import { FaCube, FaDownload, FaExpand, FaExclamationTriangle } from "react-icons/fa";
 import * as THREE from "three";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 
@@ -180,10 +183,10 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
       loader.load(
         stlFile,
         (geometry) => {
-          const material = new THREE.MeshStandardMaterial({ 
-            color: 0x888888, // Neutral gray
-            metalness: 0.2,  // Low metalness for a matte, solid look
-            roughness: 0.6   // High roughness for a non-shiny surface
+          const material = new THREE.MeshPhongMaterial({ 
+            color: 0x888888, // Neutral gray like SOLIDWORKS default
+            shininess: 30,   // Lower shininess for more matte finish
+            specular: 0x222222 // Subtle specular highlights
           });
           const mesh = new THREE.Mesh(geometry, material);
           
