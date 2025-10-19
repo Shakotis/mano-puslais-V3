@@ -73,9 +73,7 @@ const About: React.FC = () => {
             <CardBody className="p-10">
               <p className="text-lg text-gray-300 leading-relaxed text-center">
                 I am a high school student at Kauno &lsquo;Saulės&rsquo; Gimnazija with a
-                deep-seated passion for design and engineering. I thrive on
-                challenges and am a natural leader, always pushing myself to
-                grow. My personal projects have taught me invaluable lessons in
+                deep-seated passion for design and engineering. My journey started when I began exploring various engineering disciplines, and settled on mechanical engineering. My personal projects have taught me invaluable lessons in
                 project management and a commitment to continuous improvement. I
                 specialize in integrating mechanical and electronic components,
                 with hands-on experience from project conception to completion.

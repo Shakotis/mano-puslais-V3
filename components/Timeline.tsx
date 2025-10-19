@@ -50,7 +50,7 @@ const Timeline: React.FC = () => {
       date: "2024/10",
       title: "Finished Robot Tank",
       icon: <FaRobot className="w-6 h-6" />,
-      description: "Completed the design, fabrication, and programming of a fully autonomous robot tank, showcasing skills in mechanical and electronic integration.",
+      description: "after 1 and a half of years finaly finished my big project which taught me invaluable lessons in different fields from planning to building.",
       isProjectLink: true,
       projectId: "tracked-robot-chassis"
     },
@@ -58,13 +58,13 @@ const Timeline: React.FC = () => {
       date: "2025/01", 
       title: "Started SOLIDWORKS",
       icon: <FaCode className="w-6 h-6" />,
-      description: "Began mastering SOLIDWORKS for advanced 3D modeling, simulation, and computer-aided design."
+      description: "After 2 years of FREECAD, I finally decided to switch to SOLIDWORKS. which improved my workflow and design capabilities significantly.",
     },
     {
       date: "2025/06",
       title: "Opened Motorcycle Repair Shop",
       icon: <span className="text-2xl">🏍️</span>,
-      description: "Launched a motorcycle repair shop, combining mechanical expertise with entrepreneurial skills to serve the local community.",
+      description: "In 2 months, my friend and I converted my grandma's garage into a motorcycle repair shop which is now successfully running and providing quality repair services.",
       isExternal: true,
       link: "https://www.instagram.com/rsmoto.lt"
     },
@@ -72,7 +72,7 @@ const Timeline: React.FC = () => {
       date: "2025/08",
       title: "Joined THUNDERCLAP Labs",
       icon: <span className="text-2xl">🔧</span>,
-      description: "As a 3D Modeling and Engineering Specialist, I contribute to projects like Cloud Seeding and Rocket Fuel Automation, utilizing skills in SolidWorks, robotics, and 3D printing.",
+      description: "Joined a like-minded engineering collective focused on innovation. Actively participating in various startup programs. Currently in position of aerospace/mechanical engineer.",
       isExternal: true,
       link: "https://thunderclaplabs.com"
     }

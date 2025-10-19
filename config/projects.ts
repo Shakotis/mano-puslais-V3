@@ -28,7 +28,7 @@ export const projectsConfig: ProjectConfig[] = [
   {
     id: "camera-head-robot",
     title: "project AVATARAS",
-    description: "A humanoid robot with a camera for a head. This project is currently on hold, pending further development.",
+    description: "A gimbal systems controled with VR headset for neurobiological research.",
     link: "#",
     githubLink: "#",
     downloadLink: "#",
@@ -42,29 +42,29 @@ export const projectsConfig: ProjectConfig[] = [
     features: ["Humanoid Design", "Camera Head", "Bipedal"],
     stlFile: "/avataras-Assembly.stl",
     detailedInfo: {
-      overview: "This project involves the design and construction of a humanoid robot. The defining feature is a camera integrated into the head, providing a first-person view for remote operation or autonomous navigation. The project is currently paused.",
+      overview: "after a request from a neurobiology expert I gathered a team and together we started designing a humanoid robot capable of mimicking human head movements.",
       challenges: [
         "Designing stable bipedal locomotion.",
-        "Integrating camera and video transmission.",
-        "Developing control systems for movement."
+        "Integrating camera and wireless high definition video transmission.",
+        "Kinematics."
       ],
       lessons: [
         "Complexities of humanoid robot design.",
-        "Balancing aesthetics and functionality.",
+        "Balancing compactness and functionality.",
         "Planning for modular electronics and components."
       ],
       specifications: {
-        "Height": "TBD",
-        "Weight": "TBD",
-        "Actuators": "Servos/Motors",
-        "Status": "On Hold"
+        "Height": "200mm",
+        "Weight": "2kg",
+        "Actuators": "DIY Servos",
+
       }
     }
   },
   {
     id: "tracked-robot-chassis",
     title: "Tracked Robot Chassis",
-    description: "A self-designed and fabricated robot chassis, this project highlights my skills in mechanical design and hands-on fabrication. It features a robust tracked system for superior mobility on diverse terrains.",
+    description: "A self-designed and fabricated modular robot chassis. Designed to capture the beauty of our nature through the stealthiness. It features a robust tracked system for superior mobility on diverse terrains.",
     link: "https://www.thingiverse.com/thing:6713139/comments",
     githubLink: "#",
     downloadLink: "https://www.thingiverse.com/thing:6713139/files",
@@ -74,28 +74,27 @@ export const projectsConfig: ProjectConfig[] = [
       { name: "CAD Design", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
       { name: "3D Printing", icon: React.createElement(FaPrint, { className: "w-4 h-4" }) },
       { name: "Mechanical Engineering", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
+      { name: "Electronics", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
     ],
     features: ["Tracked Drive", "Modular Design", "Open Source"],
     stlFile: "/Remas.stl",
     detailedInfo: {
-      overview: "This tracked robot chassis is a comprehensive mechanical engineering project, from initial concept to final fabrication. It demonstrates proficiency in CAD, 3D printing, and mechanical assembly.",
+      overview: "This tracked robot chassis project tested my skills from initial concept to final fabrication. from 3D modeling in FREECAD to coding the controls",
       challenges: [
         "Designing a durable track tensioning system.",
-        "Optimizing weight distribution for stability.",
-        "Creating modular mounting points for future upgrades."
+        "Part optimization for heavy loadings.",
+        "Creating a suitable gearbox design from scrap materials."
       ],
       lessons: [
         "The importance of iterative design and prototyping.",
-        "Material selection for 3D-printed mechanical parts.",
-        "Best practices for open-source project documentation."
+        "Improvements in 3D modeling for mechanical assemblies.",
+        "Importance of creating a good plan for project execution."
       ],
       specifications: {
-        "Dimensions": "300mm x 200mm x 150mm",
-        "Weight": "~1.2kg (w/o electronics)",
-        "Track Material": "TPU",
-        "Chassis Material": "PLA+",
-        "Assembly Time": "~4 hours",
-        "Print Time": "~18 hours"
+        "Dimensions": "450mm x 400mm x 150mm",
+        "Weight": "~10kg ",
+        "Track Material": "PLA",
+        "Chassis Material": "metal"
       }
     }
   }
