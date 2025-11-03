@@ -15,7 +15,8 @@ export interface ProjectConfig {
     icon: React.ReactNode;
   }>;
   features: string[];
-  stlFile: string; // Supports both .stl and .3mf files
+  stlFile?: string; // Supports both .stl and .3mf files (optional)
+  imageFile?: string; // For projects using images instead of 3D models
   detailedInfo: {
     overview: string;
     challenges: string[];
@@ -25,6 +26,77 @@ export interface ProjectConfig {
 }
 
 export const projectsConfig: ProjectConfig[] = [
+  {
+    id: "new-project-1",
+    title: "homework scraper app",
+    description: "App that automaticaly organizes all homework to one google tasks for easy access.",
+    link: "#",
+    githubLink: "#",
+    downloadLink: "https://nd.dovydas.space",
+    status: "Currently Working",
+    progress: 80,
+    technologies: [
+      { name: "CAD Design", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
+      { name: "3D Printing", icon: React.createElement(FaPrint, { className: "w-4 h-4" }) },
+      { name: "Electronics", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
+    ],
+    features: ["Modular Design", "Advanced Control", "Open Source"],
+    imageFile: "/scraper.png",
+    detailedInfo: {
+      overview: "after first hearing about vibe-coding i wanted to see its potential, and got carried away by my imagination, so i build this. had to learn a lot of new things along the way. HUGE THANKS to my friend <a href='https://ignuxas.com' target='_blank' rel='noopener noreferrer' class='text-indigo-400 hover:text-indigo-300 underline'>ignuxas.com</a>",
+      challenges: [
+        "google cloud api integration.",
+        "optimizing backend RAM usage.",
+        "hosting the application on home server."
+      ],
+      lessons: [
+        "Advanced CAD modeling techniques.",
+        "System integration best practices.",
+        "Iterative design methodology."
+      ],
+      specifications: {
+        "backend RAM": "1GB",
+        "frontend": "node.js and react",
+        "backend": "Django REST Framework",
+      }
+    }
+  },
+  {
+    id: "time-lapse",
+    title: "DIY time-lapse flash",
+    description: "budget-friendly time-lapse flash build form construction lamp and electronics laying around.",
+    link: "#",
+    githubLink: "#",
+    downloadLink: "#",
+    status: "Completed",  
+    progress: 100,
+    technologies: [
+      { name: "CAD Design", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
+      { name: "3D Printing", icon: React.createElement(FaPrint, { className: "w-4 h-4" }) },
+      { name: "Electronics", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
+    ],
+    features: ["Modular Design", "Advanced Control", "Open Source"],
+    imageFile: "time-lapse.png",
+    detailedInfo: {
+      overview: "with few electronic components(Pi pico and a relay) i turned a construction lamp into a time-lapse flash. Signal from camera is detected by Pi pico reading the signal from flash pins.",
+      challenges: [
+        "reverse engineering camera flash pin-out.",
+        "ensuring safety while working with 220V.",
+        "making the design compact."
+      ],
+      lessons: [
+        "Advanced CAD modeling techniques.",
+        "System integration best practices.",
+        "Iterative design methodology."
+      ],
+      specifications: {
+        "microcomputer": "Raspberry Pi Pico",
+        "Weight": "200g",
+        "Material": "PLA(mounting plate)",
+        "Power": "220v AC"
+      }
+    }
+  },
   {
     id: "camera-head-robot",
     title: "project AVATARAS",

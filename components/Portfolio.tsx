@@ -1,22 +1,35 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
-
+import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
 import { Accordion, AccordionItem } from "@heroui/accordion";
 import { Progress } from "@heroui/progress";
 import { motion } from "framer-motion";
 import {
   FaExternalLinkAlt,
   FaCube,
+  FaTimes,
 } from "react-icons/fa";
 import STLPreview from "./STLPreview";
 import { projectsConfig, getProgressColor, getProgressGradient } from "../config/projects";
 
 const Portfolio: React.FC = () => {
   const projects = projectsConfig;
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleImageClick = (imageUrl: string) => {
+    setZoomedImage(imageUrl);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setZoomedImage(null), 300);
+  };
 
   const scrollToProject = (projectId: string) => {
     // Add a small delay to ensure DOM is ready
@@ -51,7 +64,7 @@ const Portfolio: React.FC = () => {
           <div className="w-24 h-1 bg-indigo-500 mx-auto"></div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 auto-rows-max">
           {projects.map((project, index) => (
             <motion.div
               key={project.title}
@@ -61,7 +74,7 @@ const Portfolio: React.FC = () => {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
               whileHover={{ y: -5 }}
-              className="h-full flex min-h-[800px]"
+              className="flex"
             >
               <Card 
                 className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-indigo-500 transition-all duration-300 w-full flex flex-col rounded-xl"
@@ -71,11 +84,24 @@ const Portfolio: React.FC = () => {
               >
                 <CardHeader className="p-4">
                   <div className="w-full h-80 bg-gray-800/50 border border-gray-700 rounded-lg relative overflow-hidden">
-                    <STLPreview stlFile={project.stlFile} />
+                    {project.imageFile ? (
+                      <img 
+                        src={project.imageFile} 
+                        alt={project.title}
+                        className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                        onClick={() => handleImageClick(project.imageFile!)}
+                      />
+                    ) : project.stlFile ? (
+                      <STLPreview stlFile={project.stlFile} />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-500">
+                        No preview available
+                      </div>
+                    )}
                   </div>
                 </CardHeader>
                 
-                <CardBody className="p-4 flex-1 flex flex-col h-full">
+                <CardBody className="p-4 flex-1 flex flex-col">
                   {/* Top content - fixed height for alignment */}
                   <div className="flex-grow-0">
                     <div className="flex justify-between items-start mb-3">
@@ -150,9 +176,10 @@ const Portfolio: React.FC = () => {
                       title={<span className="text-gray-300 font-medium">Overview</span>}
                       className="bg-gray-800/30 border-none"
                     >
-                      <p className="text-gray-400 text-sm leading-relaxed pb-2">
-                        {project.detailedInfo.overview}
-                      </p>
+                      <p 
+                        className="text-gray-400 text-sm leading-relaxed pb-2"
+                        dangerouslySetInnerHTML={{ __html: project.detailedInfo.overview }}
+                      />
                     </AccordionItem>
                     <AccordionItem
                       key="challenges"
@@ -210,8 +237,40 @@ const Portfolio: React.FC = () => {
                             View Project Page
                           </Button>
                         ) : (
-                          // Other projects: Default options
-                          null
+                          // Other projects: Show available links
+                          <div className="space-y-2">
+                            {project.link && project.link !== "#" && (
+                              <Button
+                                as="a"
+                                href={project.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg"
+                                radius="full"
+                                startContent={<FaExternalLinkAlt className="w-4 h-4" />}
+                              >
+                                View Project
+                              </Button>
+                            )}
+                            {project.downloadLink && project.downloadLink !== "#" && (
+                              <Button
+                                as="a"
+                                href={project.downloadLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg"
+                                radius="full"
+                                startContent={<FaExternalLinkAlt className="w-4 h-4" />}
+                              >
+                                Access App
+                              </Button>
+                            )}
+                            {(!project.link || project.link === "#") && (!project.downloadLink || project.downloadLink === "#") && (
+                              <div className="text-center py-4">
+                                <p className="text-gray-500 text-sm">No links available</p>
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
                     </AccordionItem>
@@ -245,6 +304,32 @@ const Portfolio: React.FC = () => {
             </Card>
           </motion.div>
         </div>
+
+        {/* Image Zoom Modal */}
+        <Modal 
+          isOpen={isModalOpen} 
+          onClose={closeModal}
+          size="5xl"
+          classNames={{
+            backdrop: "bg-black/80 backdrop-blur-sm",
+            base: "bg-transparent shadow-none",
+            closeButton: "text-white hover:bg-white/20 text-2xl p-2 m-4"
+          }}
+        >
+          <ModalContent>
+            <ModalBody className="p-0">
+              {zoomedImage && (
+                <div className="relative w-full h-full flex items-center justify-center p-4">
+                  <img 
+                    src={zoomedImage} 
+                    alt="Zoomed project"
+                    className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                  />
+                </div>
+              )}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       </div>
     </section>
   );

@@ -117,6 +117,13 @@ const STLPreview: React.FC<STLPreviewProps> = ({ stlFile }) => {
     setLoading(true);
     setError(null);
     
+    // Check if stlFile is provided
+    if (!stlFile) {
+      setLoading(false);
+      setError("No 3D model file provided.");
+      return;
+    }
+    
     // Get file extension
     const fileExtension = stlFile.split('.').pop()?.toLowerCase();
     const is3MF = fileExtension === '3mf';

@@ -1,6 +1,6 @@
 "use client";
 
-import ThreeBackground from "@/components/ThreeBackground";
+import ParticlesBackground from "@/components/ParticlesBackground";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
@@ -14,7 +14,7 @@ import RocketScrollToTop from "@/components/RocketScrollToTop";
 export default function Home() {
   return (
     <div className="bg-transparent text-gray-100 relative">
-      <ThreeBackground />
+      <ParticlesBackground />
       <Header />
       
       <main>
