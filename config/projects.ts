@@ -149,7 +149,7 @@ export const projectsConfig: ProjectConfig[] = [
       { name: "Electronics", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
     ],
     features: ["Tracked Drive", "Modular Design", "Open Source"],
-    stlFile: "/Remas.stl",
+    imageFile: "/ROBOT2.png",
     detailedInfo: {
       overview: "This tracked robot chassis project tested my skills from initial concept to final fabrication. from 3D modeling in FREECAD to coding the controls",
       challenges: [
