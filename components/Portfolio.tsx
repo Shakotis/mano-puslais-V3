@@ -230,7 +230,7 @@ const Portfolio: React.FC = () => {
                             href={project.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg"
+                            className="w-full bg-white hover:bg-gray-100 text-gray-900 shadow-lg"
                             radius="full"
                             startContent={<FaExternalLinkAlt className="w-4 h-4" />}
                           >
@@ -258,11 +258,11 @@ const Portfolio: React.FC = () => {
                                 href={project.downloadLink}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg"
+                                className="w-full bg-white hover:bg-gray-100 text-gray-900 shadow-lg"
                                 radius="full"
                                 startContent={<FaExternalLinkAlt className="w-4 h-4" />}
                               >
-                                Access App
+                                View page
                               </Button>
                             )}
                             {(!project.link || project.link === "#") && (!project.downloadLink || project.downloadLink === "#") && (
@@ -310,24 +310,29 @@ const Portfolio: React.FC = () => {
           isOpen={isModalOpen} 
           onClose={closeModal}
           size="5xl"
+          hideCloseButton={true}
           classNames={{
             backdrop: "bg-black/80 backdrop-blur-sm",
-            base: "bg-transparent shadow-none",
-            closeButton: "text-white hover:bg-white/20 text-2xl p-2 m-4"
+            base: "bg-transparent shadow-none"
           }}
         >
           <ModalContent>
-            <ModalBody className="p-0">
-              {zoomedImage && (
-                <div className="relative w-full h-full flex items-center justify-center p-4">
-                  <img 
-                    src={zoomedImage} 
-                    alt="Zoomed project"
-                    className="max-w-full max-h-[90vh] object-contain rounded-lg"
-                  />
-                </div>
-              )}
-            </ModalBody>
+            {(onClose) => (
+              <ModalBody className="p-0">
+                {zoomedImage && (
+                  <div 
+                    className="relative w-full h-full flex items-center justify-center p-4 cursor-pointer"
+                    onClick={closeModal}
+                  >
+                    <img 
+                      src={zoomedImage} 
+                      alt="Zoomed project"
+                      className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+              </ModalBody>
+            )}
           </ModalContent>
         </Modal>
       </div>

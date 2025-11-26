@@ -75,12 +75,20 @@ const Timeline: React.FC = () => {
       description: "Joined a like-minded engineering collective focused on innovation. Actively participating in various startup programs. Currently in position of aerospace/mechanical engineer.",
       isExternal: true,
       link: "https://thunderclaplabs.com"
+    },
+    {
+      date: "2025/10",
+      title: "NASA Space Apps Challenge - Global Nominee",
+      icon: <span className="text-2xl">🚀</span>,
+      description: "Our team became a Global Nominee in the NASA Space Apps Challenge, competing among thousands of teams worldwide with our innovative solution.",
+      isExternal: true,
+      link: "https://www.linkedin.com/posts/thunderclap-labs_nasaspaceapps-globalnominee-thunderclaplabs-activity-7392956577286123521-S0tj/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFSfibwBpHhng_eQja73HvM3NhVzUCyTXes"
     }
   ];
 
   const software: Software[] = [
-    { name: "FreeCAD", src: "/FreeCAD-symbol.svg.png", experience: "2 years", period: "2023 - 2025/01" },
-    { name: "SOLIDWORKS", src: "/SolidWorks logo.jpg", experience: "Current - Advanced", period: "2025/01 - Present", className: "w-48 h-16" },
+    { name: "FreeCAD", src: "/FreeCAD-symbol.svg.png", experience: "CAD", period: "2023 - 2025/01" },
+    { name: "SOLIDWORKS", src: "/SolidWorks logo.jpg", experience: "CAD", period: "Since 2025/01", className: "w-48 h-16" },
     { name: "OpenMotor", src: "/openMotor logo.png", experience: "Motor Simulation", period: "Since 2025/08" },
     { name: "OpenRocket", src: "/OpenRocket_icon.png", experience: "Rocket Simulation", period: "Since 2025/08" }
   ];

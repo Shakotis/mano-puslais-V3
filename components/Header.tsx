@@ -294,7 +294,7 @@ const Header: React.FC = () => {
                 className="p-6 border-t border-white/10 bg-white/5"
               >
                 <p className="text-sm text-gray-400 text-center font-medium">
-                  © 2024 Dovydas Jusevičius
+                  © 2025 Dovydas Jusevičius
                 </p>
               </motion.div>
             </div>
