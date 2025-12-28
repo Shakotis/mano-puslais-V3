@@ -26,15 +26,47 @@ export interface ProjectConfig {
 }
 
 export const projectsConfig: ProjectConfig[] = [
+    {
+    id: "prosthetic-beak",
+    title: "Prosthetic Beak for bird",
+    description: "Prosthetic beak for bird machined from titanium.",
+    link: "#",
+    githubLink: "#",
+    downloadLink: "#",
+    status: "Completed",  
+    progress: 100,
+    technologies: [
+      { name: "CAD Design", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
+    ],
+    features: ["Modular Design", "Advanced Control", "Open Source"],
+    imageFile: "/beak.jpg",
+    detailedInfo: {
+      overview: "After bird broke its beak, Kaunas zoo referred to KTU, which contacted our team, and I took on the challenge. Unfortunately, due to bird's beak cracking further, by the time prosthetic was ready, zoo wasn't able to proceed with the implantation.",
+      challenges: [
+        "Designing a beak from images",
+        "Fast iterations due to bird's health",
+        "Material selection for biocompatibility"
+
+      ],
+      lessons: [
+        "Advanced CAD modeling techniques.",
+        "System integration best practices.",
+        "Iterative design methodology."
+      ],
+      specifications: {
+        "Software": "SOLIDWORKS and Creality Scan",
+      }
+    }
+  },
   {
-    id: "new-project-1",
-    title: "homework scraper app",
+    id: "sraper",
+    title: "Homework scraper app",
     description: "App that automaticaly organizes all homework to one google tasks for easy access.",
     link: "#",
     githubLink: "#",
     downloadLink: "https://nd.dovydas.space",
-    status: "Currently Working",
-    progress: 80,
+    status: "Completed",
+    progress: 100,
     technologies: [
       { name: "CAD Design", icon: React.createElement(FaCube, { className: "w-4 h-4" }) },
       { name: "3D Printing", icon: React.createElement(FaPrint, { className: "w-4 h-4" }) },

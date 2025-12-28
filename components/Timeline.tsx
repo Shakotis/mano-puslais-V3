@@ -87,6 +87,8 @@ const Timeline: React.FC = () => {
   ];
 
   const software: Software[] = [
+    { name: "Blender", src: "/Blender logo.png", experience: "Computer graphics", period: "Since 2021" },
+    { name: "DaVinci Resolve", src: "/DaVinci_Resolve_Studio.png", experience: "Video editing", period: "Since 2022" },
     { name: "FreeCAD", src: "/FreeCAD-symbol.svg.png", experience: "CAD", period: "2023 - 2025/01" },
     { name: "SOLIDWORKS", src: "/SolidWorks logo.jpg", experience: "CAD", period: "Since 2025/01", className: "w-48 h-16" },
     { name: "OpenMotor", src: "/openMotor logo.png", experience: "Motor Simulation", period: "Since 2025/08" },
@@ -132,7 +134,7 @@ const Timeline: React.FC = () => {
                   <Card className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-indigo-500 transition-all duration-300 rounded-xl flex-1" isPressable radius="lg">
                     <CardBody className="p-8 flex flex-col items-center justify-center text-center h-full min-h-[240px]">
                       <div className={`mb-6 flex-shrink-0 relative ${s.className || 'w-16 h-16'}`}>
-                        <Image src={s.src} alt={`${s.name} logo`} layout="fill" objectFit="contain" />
+                        <Image src={s.src} alt={`${s.name} logo`} fill style={{ objectFit: 'contain', objectPosition: 'center' }} />
                       </div>
                       <span className="text-2xl font-semibold text-white mb-4 flex-shrink-0">{s.name}</span>
                       <p className="text-base text-gray-300 mb-2 flex-grow flex items-center justify-center text-center">{s.experience}</p>
